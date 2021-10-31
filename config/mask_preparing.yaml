@@ -22,10 +22,10 @@ pose_file: '../data/sequences/08/poses.txt'
 calib_file: '../data/sequences/08/calib.txt'
 
 # Outputs
-# the suffix should be the same as num_last_n!
-residual_image_folder: '../data/sequences/08/residual_images_1'
+# the onehot encoded mask: 0,1,2
+mask_image_filder: '../data/sequences/08/mask_image'
 visualize: True
-visualization_folder: '../data/sequences/08/residual_visualization_1'
+visualization_folder: '../data/sequences/08/mask_visualization'
 
 # range image parameters
 range_image:

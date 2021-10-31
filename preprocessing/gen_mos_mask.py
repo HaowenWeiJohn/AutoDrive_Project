@@ -1,7 +1,7 @@
 import yaml
 
 from preprocessing.utils import *
-from laserscan import *
+from example.laserscan import *
 
 data_path = '../data/sequences/08/velodyne/000030.bin'
 label_path = '../data/sequences/08/labels/000030.label'
@@ -30,3 +30,6 @@ sem_scan.open_label(label_path)
 
 original_label=np.copy(sem_scan.proj_sem_label)
 label_new=sem_label_transform(original_label)
+
+
+
