@@ -281,3 +281,11 @@ def gen_transformation(yaw, translation):
   transformation[:3, 3] = [translation[0], translation[1], translation[2]]
   
   return transformation
+
+
+# transfer the label from one dict to another
+def sem_label_transform(raw_label_map, label_transfer_dict):
+  for i in label_transfer_dict.keys():
+    pre_map = raw_label_map == i
+    raw_label_map[pre_map] = label_transfer_dict[i]
+  return raw_label_map

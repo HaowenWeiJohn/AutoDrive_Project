@@ -5,17 +5,15 @@
 
 # General parameters
 # number of frames for training, -1 uses all frames
-num_frames: -1
-# plot images
+
 debug: False
-# normalize/scale the difference with corresponding range value
-normalize: True
-# use the last n frame to calculate the difference image
-num_last_n: 1
 
 # Inputs
 # the folder of raw LiDAR scans
 scan_folder: '../data/sequences/08/velodyne'
+# the folder of labels
+label_folder: '../data/sequences/08/labels'
+
 # ground truth poses file
 pose_file: '../data/sequences/08/poses.txt'
 # calibration file
@@ -23,7 +21,7 @@ calib_file: '../data/sequences/08/calib.txt'
 
 # Outputs
 # the onehot encoded mask: 0,1,2
-mask_image_filder: '../data/sequences/08/mask_image'
+mask_image_folder: '../data/sequences/08/mask_image'
 visualize: True
 visualization_folder: '../data/sequences/08/mask_visualization'
 

@@ -11,7 +11,7 @@ debug: False
 # normalize/scale the difference with corresponding range value
 normalize: True
 # use the last n frame to calculate the difference image
-num_last_n: 1
+num_last_n: 3
 
 # Inputs
 # the folder of raw LiDAR scans
@@ -23,9 +23,9 @@ calib_file: '../data/sequences/08/calib.txt'
 
 # Outputs
 # the suffix should be the same as num_last_n!
-residual_image_folder: '../data/sequences/08/residual_images_1'
+residual_image_folder: '../data/sequences/08/residual_images_3'
 visualize: True
-visualization_folder: '../data/sequences/08/residual_visualization_1'
+visualization_folder: '../data/sequences/08/residual_visualization_3'
 
 # range image parameters
 range_image:

@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 import numpy as np
-
+import random
 
 class LaserScan:
   """Class that contains LaserScan with x,y,z,r"""
   EXTENSIONS_SCAN = ['.bin']
 
-  def __init__(self, project=False, H=64, W=1024, fov_up=3.0, fov_down=-25.0):
+  def __init__(self, project=False, flip_sign=True,H=64, W=1024, fov_up=3.0, fov_down=-25.0):
     self.project = project
     self.proj_H = H
     self.proj_W = W
     self.proj_fov_up = fov_up
     self.proj_fov_down = fov_down
+    self.flip_sign=flip_sign
     self.reset()
 
   def reset(self):
@@ -94,6 +95,11 @@ class LaserScan:
 
     # put in attribute
     self.points = points    # get xyz
+    if self.flip_sign:
+        if random.random()<0.5:
+            self.points[:, 1] = -self.points[:, 1]
+        if random.random()<0.5:
+            self.points[:, 0] = -self.points[:, 0]
     if remissions is not None:
       self.remissions = remissions  # get remission
     else:
@@ -170,8 +176,8 @@ class SemLaserScan(LaserScan):
   """Class that contains LaserScan with x,y,z,r,sem_label,sem_color_label,inst_label,inst_color_label"""
   EXTENSIONS_LABEL = ['.label']
 
-  def __init__(self, nclasses, sem_color_dict=None, project=False, H=64, W=1024, fov_up=3.0, fov_down=-25.0):
-    super(SemLaserScan, self).__init__(project, H, W, fov_up, fov_down)
+  def __init__(self, nclasses, sem_color_dict=None, project=False, flip_sign=False, H=64, W=1024, fov_up=3.0, fov_down=-25.0):
+    super(SemLaserScan, self).__init__(project, flip_sign,H, W, fov_up, fov_down)
     self.reset()
     self.nclasses = nclasses         # number of classes
 

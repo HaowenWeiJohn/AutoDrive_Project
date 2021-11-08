@@ -87,6 +87,17 @@ if __name__ == '__main__':
         if frame_idx < num_last_n:
             np.save(file_name, diff_image)
 
+            if visualize:
+                fig = plt.figure(frameon=False, figsize=(16, 10))
+                fig.set_size_inches(20.48, 0.64)
+                ax = plt.Axes(fig, [0., 0., 1., 1.])
+                ax.set_axis_off()
+                fig.add_axes(ax)
+                ax.imshow(diff_image, vmin=0, vmax=1)
+                image_name = os.path.join(visualization_folder, str(frame_idx).zfill(6))
+                plt.savefig(image_name)
+                plt.close()
+
         else:
             # load current scan and generate current range image
             current_pose = poses[frame_idx]
