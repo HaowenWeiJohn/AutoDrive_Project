@@ -4,6 +4,7 @@
 # Brief: This script generates residual images
 
 import os
+import shutil
 import sys
 import yaml
 import numpy as np
@@ -19,71 +20,121 @@ except:
     print("Currently using python-lib to generate range images.")
     from utils import range_projection
 
-if __name__ == '__main__':
-    # load config file
-    config_filename = '../config/data_preparing.yaml'
-    if len(sys.argv) > 1:
-        config_filename = sys.argv[1]
+# if __name__ == '__main__':
+# load config file
+config_filename = '../config/data_preparing.yaml'
+if len(sys.argv) > 1:
+    config_filename = sys.argv[1]
 
-    if yaml.__version__ >= '5.1':
-        config = yaml.load(open(config_filename), Loader=yaml.FullLoader)
-    else:
-        config = yaml.load(open(config_filename))
+if yaml.__version__ >= '5.1':
+    config = yaml.load(open(config_filename), Loader=yaml.FullLoader)
+else:
+    config = yaml.load(open(config_filename))
 
-    # specify parameters
-    num_frames = config['num_frames']
-    debug = config['debug']
-    normalize = config['normalize']
-    num_last_n = config['num_last_n']
-    visualize = config['visualize']
-    visualization_folder = config['visualization_folder']
 
-    # specify the output folders
-    residual_image_folder = config['residual_image_folder']
-    if not os.path.exists(residual_image_folder):
-        os.makedirs(residual_image_folder)
+data_folder = config['data_folder']
+sequences = config['sequences']
 
-    if visualize:
-        if not os.path.exists(visualization_folder):
-            os.makedirs(visualization_folder)
+sequence_folder = os.path.join(data_folder, sequences)
 
-    # load poses
-    pose_file = config['pose_file']
-    poses = np.array(load_poses(pose_file))
-    inv_frame0 = np.linalg.inv(poses[0])
 
-    # load calibrations
-    calib_file = config['calib_file']
-    T_cam_velo = load_calib(calib_file)
-    T_cam_velo = np.asarray(T_cam_velo).reshape((4, 4))
-    T_velo_cam = np.linalg.inv(T_cam_velo)
+# specify parameters
+num_frames = config['num_frames']
+debug = config['debug']
+normalize = config['normalize']
 
-    # convert kitti poses from camera coord to LiDAR coord
-    new_poses = []
-    for pose in poses:
-        new_poses.append(T_velo_cam.dot(inv_frame0).dot(pose).dot(T_cam_velo))
-    poses = np.array(new_poses)
+num_last_ns = config['num_last_ns']
+visualize = config['visualize']
 
-    # load LiDAR scans
-    scan_folder = config['scan_folder']
-    scan_paths = load_files(scan_folder)
+residual_visualization_folder_ns = []
+residual_images_folder_ns = []
 
-    # test for the first N scans
-    if num_frames >= len(poses) or num_frames <= 0:
-        print('generate training data for all frames with number of: ', len(poses))
-    else:
-        poses = poses[:num_frames]
-        scan_paths = scan_paths[:num_frames]
+# projection folder
+range_images_folder = os.path.join(sequence_folder,'range_images_folder')
 
-    range_image_params = config['range_image']
+if os.path.isdir(range_images_folder):
+    shutil.rmtree(range_images_folder)
+os.mkdir(range_images_folder)
 
-    # generate residual images for the whole sequence
-    for frame_idx in tqdm(range(len(scan_paths))):
-        file_name = os.path.join(residual_image_folder, str(frame_idx).zfill(6))
+for num_last_n in num_last_ns:
+    residual_visualization_folder_n = os.path.join(sequence_folder, 'residual_visualization_'+str(num_last_n))
+    if os.path.isdir(residual_visualization_folder_n):
+        shutil.rmtree(residual_visualization_folder_n)
+    os.mkdir(residual_visualization_folder_n)
+    residual_visualization_folder_ns.append(residual_visualization_folder_n)
+
+    residual_image_folder_n = os.path.join(sequence_folder, 'residual_images_'+str(num_last_n))
+    if os.path.isdir(residual_image_folder_n):
+        shutil.rmtree(residual_image_folder_n)
+    os.mkdir(residual_image_folder_n)
+    residual_images_folder_ns.append(residual_image_folder_n)
+
+
+
+
+# specify the output folders
+
+
+
+
+# load poses
+pose_file = config['pose_file']
+pose_file = os.path.join(sequence_folder, pose_file)
+
+poses = np.array(load_poses(pose_file))
+inv_frame0 = np.linalg.inv(poses[0])
+
+# load calibrations
+calib_file = config['calib_file']
+calib_file = os.path.join(sequence_folder, calib_file)
+
+T_cam_velo = load_calib(calib_file)
+T_cam_velo = np.asarray(T_cam_velo).reshape((4, 4))
+T_velo_cam = np.linalg.inv(T_cam_velo)
+
+# convert kitti poses from camera coord to LiDAR coord
+new_poses = []
+for pose in poses:
+    new_poses.append(T_velo_cam.dot(inv_frame0).dot(pose).dot(T_cam_velo))
+poses = np.array(new_poses)
+
+# load LiDAR scans
+scan_folder = config['scan_folder']
+scan_folder = os.path.join(sequence_folder, scan_folder)
+
+scan_paths = load_files(scan_folder)
+
+# test for the first N scans
+if num_frames >= len(poses) or num_frames <= 0:
+    print('generate training data for all frames with number of: ', len(poses))
+else:
+    poses = poses[:num_frames]
+    scan_paths = scan_paths[:num_frames]
+
+range_image_params = config['range_image']
+
+# generate residual images for the whole sequence
+for frame_idx in tqdm(range(len(scan_paths))):
+
+    current_pose = poses[frame_idx]
+    current_scan = load_vertex(scan_paths[frame_idx])
+    current_proj_vertex = range_projection(current_scan.astype(np.float32),
+                                     range_image_params['height'], range_image_params['width'],
+                                     range_image_params['fov_up'], range_image_params['fov_down'],
+                                     range_image_params['max_range'], range_image_params['min_range'])
+    current_range = current_proj_vertex[:, :, 3]
+    range_image_file_name = os.path.join(range_images_folder, str(frame_idx).zfill(6))
+    np.save(range_image_file_name, current_proj_vertex)
+
+    for n_index, num_last_n in enumerate(num_last_ns):
+
+        file_name = os.path.join(residual_images_folder_ns[n_index], str(frame_idx).zfill(6))
         diff_image = np.full((range_image_params['height'], range_image_params['width']), 0,
                              dtype=np.float32)  # [H,W] range (0 is no data)
 
-        # for the first N frame we generate a dummy file
+    # load current scan and generate current range image
+
+    # for the first N frame we generate a dummy file
         if frame_idx < num_last_n:
             np.save(file_name, diff_image)
 
@@ -94,18 +145,12 @@ if __name__ == '__main__':
                 ax.set_axis_off()
                 fig.add_axes(ax)
                 ax.imshow(diff_image, vmin=0, vmax=1)
-                image_name = os.path.join(visualization_folder, str(frame_idx).zfill(6))
+                image_name = os.path.join(residual_visualization_folder_ns[n_index], str(frame_idx).zfill(6))
                 plt.savefig(image_name)
                 plt.close()
 
         else:
-            # load current scan and generate current range image
-            current_pose = poses[frame_idx]
-            current_scan = load_vertex(scan_paths[frame_idx])
-            current_range = range_projection(current_scan.astype(np.float32),
-                                             range_image_params['height'], range_image_params['width'],
-                                             range_image_params['fov_up'], range_image_params['fov_down'],
-                                             range_image_params['max_range'], range_image_params['min_range'])[:, :, 3]
+
 
             # load last scan, transform into the current coord and generate a transformed last range image
             last_pose = poses[frame_idx - num_last_n]
@@ -144,7 +189,7 @@ if __name__ == '__main__':
                 ax.set_axis_off()
                 fig.add_axes(ax)
                 ax.imshow(diff_image, vmin=0, vmax=1)
-                image_name = os.path.join(visualization_folder, str(frame_idx).zfill(6))
+                image_name = os.path.join(residual_visualization_folder_ns[n_index], str(frame_idx).zfill(6))
                 plt.savefig(image_name)
                 plt.close()
 

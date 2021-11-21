@@ -128,12 +128,16 @@ def range_projection(current_vertex, proj_H=64, proj_W=900, fov_up=3.0, fov_down
                      dtype=np.int32)  # [H,W] index (-1 is no data)
   proj_intensity = np.full((proj_H, proj_W), -1,
                            dtype=np.float32)  # [H,W] index (-1 is no data)
-  
+  features = np.full((proj_H, proj_W, 5), -1,
+                        dtype=np.float32)
+
+
   proj_range[proj_y, proj_x] = depth
   proj_vertex[proj_y, proj_x] = np.array([scan_x, scan_y, scan_z, depth]).T
   proj_idx[proj_y, proj_x] = indices
   proj_intensity[proj_y, proj_x] = intensity
-  
+  features[proj_y, proj_x] = np.array([scan_x, scan_y, scan_z, depth, intensity]).T
+
   return proj_vertex
 
 

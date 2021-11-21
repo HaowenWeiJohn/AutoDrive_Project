@@ -11,21 +11,24 @@ debug: False
 # normalize/scale the difference with corresponding range value
 normalize: True
 # use the last n frame to calculate the difference image
-num_last_n: 3
+num_last_ns: [1,2,3,4,5,6,7,8]
 
 # Inputs
 # the folder of raw LiDAR scans
-scan_folder: '../data/sequences/08/velodyne'
+data_folder: '../data/sequences/'
+sequences: '08'
+
+scan_folder: 'velodyne'
 # ground truth poses file
-pose_file: '../data/sequences/08/poses.txt'
+pose_file: 'poses.txt'
 # calibration file
-calib_file: '../data/sequences/08/calib.txt'
+calib_file: 'calib.txt'
 
 # Outputs
 # the suffix should be the same as num_last_n!
-residual_image_folder: '../data/sequences/08/residual_images_3'
+#residual_image_folder: '../data/sequences/08/residual_images_3'
 visualize: True
-visualization_folder: '../data/sequences/08/residual_visualization_3'
+#visualization_folder: '../data/sequences/08/residual_visualization_3'
 
 # range image parameters
 range_image:
