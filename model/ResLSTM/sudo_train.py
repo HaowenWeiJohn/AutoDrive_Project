@@ -1,11 +1,15 @@
 # input size (w,h,n)    n is back track images at time t, in this case we deal it as channel
 import os.path
+import sys
 
 import numpy as np
 from tensorflow.keras.callbacks import CSVLogger
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 from ResLSTM_tf import *
+
+sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
+
 
 train_data = np.random.rand(100, 8, 64, 2048, 10)
 val_data = np.random.rand(10, 8, 64, 2048, 10)
