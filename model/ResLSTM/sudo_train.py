@@ -39,7 +39,7 @@ mc = ModelCheckpoint(
 
 history = model.fit(train_data, train_output,
                              validation_data=(
-                                 val_data, val_output),
+                                 train_data, train_output),
                              epochs=1000,
                              batch_size=1,
                              validation_batch_size=1,
