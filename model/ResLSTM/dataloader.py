@@ -94,18 +94,18 @@ class CustomDataGen(tf.keras.utils.Sequence):
 
 
 
-# create data file
-
-x_dir = '../../data/train_test_val/val/x'
-y_dir = '../../data/train_test_val/val/y'
+# # create data file
 #
-# x_files = load_files(x_dir)
-# y_files = load_files(y_dir)
+# x_dir = '../../data/train_test_val/val/x'
+# y_dir = '../../data/train_test_val/val/y'
+# #
+# # x_files = load_files(x_dir)
+# # y_files = load_files(y_dir)
+# #
+# # # create_data_frame
+# # dict = {'x_files': x_files, 'y_files': y_files}
+# # df = pd.DataFrame(data=dict)
 #
-# # create_data_frame
-# dict = {'x_files': x_files, 'y_files': y_files}
-# df = pd.DataFrame(data=dict)
-
-data_gen = CustomDataGen(df=None, X_dir=x_dir, y_dir=y_dir, X_col='x_files', y_col='y_files', batch_size=10, shuffle=True)
-data_gen.__getitem__(index=20)
-data_gen.on_epoch_end()
+# data_gen = CustomDataGen(df=None, X_dir=x_dir, y_dir=y_dir, X_col='x_files', y_col='y_files', batch_size=10, shuffle=True)
+# data_gen.__getitem__(index=20)
+# data_gen.on_epoch_end()

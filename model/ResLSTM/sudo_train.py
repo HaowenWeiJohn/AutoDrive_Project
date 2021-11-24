@@ -45,8 +45,3 @@ history = model.fit(train_data, train_output,
                              validation_batch_size=1,
                              callbacks=[es, mc, csv_logger],
                              verbose=1, shuffle=True)
-
-
-
-
-
