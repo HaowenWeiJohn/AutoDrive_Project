@@ -282,7 +282,7 @@ def down_average_pool_block(input, dropout_rate=0.5, pool_size=(2,2), stride=(2,
 ########################################################
 #  (r,x,y,z,e, res1, res2, res3)
 def ResLSTM():
-    input_size = (8, 64, 2048, 10)
+    input_size = (5, 64, 2048, 10)
 
 
     input = tf.keras.Input(shape=input_size)
