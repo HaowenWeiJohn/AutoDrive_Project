@@ -42,10 +42,10 @@ def conv2d_layer(input, filters=64 ,kernal_size=(3,3), dilation_rate=(1,1), padd
 
      # activation function
     if activation:
-        output = TimeDistributed(activation)(output)
+        output = activation(output)
 
     if batch_norm:
-        output = TimeDistributed(BatchNormalization())(output)
+        output = BatchNormalization()(output)
 
     return output
 
@@ -343,11 +343,14 @@ def ResLSTM():
     dense_2 = conv2d_layer(dense_1, filters=32, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
                                    activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
 
-    output = conv2d_layer(dense_2, filters=1, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
-                                   activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
+    output = Conv2D(1, 1, activation='sigmoid')(dense_2)
+    # output = conv2d_layer(dense_2, filters=1, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
+    #                                activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
 
     model = Model(input, output)
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+    adam = tf.keras.optimizers.Adam(learning_rate=1e-3, decay=1e-5)
+    model.compile(optimizer=adam, loss='binary_crossentropy', metrics=['accuracy'])
     model.summary()
     return model
 
