@@ -37,7 +37,7 @@ for sequence in sequences:
     for sample_file_name in tqdm(samples_file_name):
         range_image_path = os.path.join(samples_folder, sample_file_name)
         sample = np.load(range_image_path)
-
+        x_folder = os.path.join(folder_name, 'x')
         sample_save_file_name = os.path.join(data_folder, folder_name, sample_file_name)
         # res images
         for back_track_n in back_track_ns:

@@ -84,6 +84,7 @@ for frame_idx in tqdm(range(len(scan_paths))):
         plt.close()
 
     # save to npy file
+    
     np.save(mask_file_name, label_new)
 
 

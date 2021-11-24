@@ -138,7 +138,7 @@ def range_projection(current_vertex, proj_H=64, proj_W=900, fov_up=3.0, fov_down
   proj_intensity[proj_y, proj_x] = intensity
   features[proj_y, proj_x] = np.array([scan_x, scan_y, scan_z, depth, intensity]).T
 
-  return proj_vertex
+  return features
 
 
 def gen_normal_map(current_range, current_vertex, proj_H=64, proj_W=900):

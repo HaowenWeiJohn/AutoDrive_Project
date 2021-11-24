@@ -11,10 +11,15 @@ from ResLSTM_tf import *
 sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
 
 
-train_data = np.random.rand(100, 8, 64, 2048, 10)
-val_data = np.random.rand(10, 8, 64, 2048, 10)
-train_output = np.random.rand(100, 64, 2048, 1)
-val_output = np.random.rand(10, 64, 2048, 1)
+# train_data = np.random.rand(100, 8, 64, 2048, 10)
+# val_data = np.random.rand(10, 8, 64, 2048, 10)
+# train_output = np.random.rand(100, 64, 2048, 1)
+# val_output = np.random.rand(10, 64, 2048, 1)
+
+train_data = np.ones((100, 8, 64, 2048, 10))
+val_data = np.ones((10, 8, 64, 2048, 10))
+train_output = np.ones((100, 64, 2048, 1))
+val_output = np.ones((10, 64, 2048, 1))
 # prepare sudo data
 
 model = ResLSTM()
