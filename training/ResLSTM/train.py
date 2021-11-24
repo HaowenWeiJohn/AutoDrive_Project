@@ -51,7 +51,7 @@ y_val_dir = '../../data/pesudo_train_test_val/val/y'
 # df = pd.DataFrame(data=dict)
 
 train_data_gen = CustomDataGen(df=None, X_dir=x_train_dir, y_dir=y_train_dir, X_col='x_files', y_col='y_files',
-                               batch_size=4, shuffle=True)
+                               batch_size=1, shuffle=True)
 val_data_gen = CustomDataGen(df=None, X_dir=x_val_dir, y_dir=y_val_dir, X_col='x_files', y_col='y_files', batch_size=5,
                              shuffle=True)
 # data_gen.__getitem__(index=20)
