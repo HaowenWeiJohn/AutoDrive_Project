@@ -18,8 +18,8 @@ sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Proje
 
 train_data = np.ones((100, 5, 64, 2048, 10))
 val_data = np.ones((10, 5, 64, 2048, 10))
-train_output = np.ones((100, 64, 2048, 1))
-val_output = np.ones((10, 64, 2048, 1))
+train_output = np.ones((100, 64, 2048, 1), dtype=int)
+val_output = np.ones((10, 64, 2048, 1), dtype=int)
 # prepare sudo data
 
 model = ResLSTM()
