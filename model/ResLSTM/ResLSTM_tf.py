@@ -304,22 +304,22 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
 
     dilation_lstm_1 = lstm_dilation_block(input=context_out, return_sequence=False)
 
-    merge_feature = concatenate([context_out[:,-1,:,:,:], dilation_lstm_1])
+    # merge_feature = concatenate([context_out[:,-1,:,:,:], dilation_lstm_1])
 
-    dilation_down_1 = dilation_down_block(merge_feature, filters=64)
+    dilation_down_1 = dilation_down_block(dilation_lstm_1, filters=32)
     down_sampling_1 = down_average_pool_block(dilation_down_1)
 
-    dilation_down_2 = dilation_down_block(down_sampling_1, filters=128)
+    dilation_down_2 = dilation_down_block(down_sampling_1, filters=64)
     down_sampling_2 = down_average_pool_block(dilation_down_2)
 
-    dilation_down_3 = dilation_down_block(down_sampling_2, filters=256)
+    dilation_down_3 = dilation_down_block(down_sampling_2, filters=128)
     down_sampling_3 = down_average_pool_block(dilation_down_3)
 
     dilation_down_4 = dilation_down_block(down_sampling_3, filters=256)
     down_sampling_4 = down_average_pool_block(dilation_down_4)
 
 
-    dilation_down_5 = dilation_down_block(down_sampling_4, filters=512)
+    dilation_down_5 = dilation_down_block(down_sampling_4, filters=256)
 
     pixel_shuffle_up_1 = pixel_shuffle_up(dilation_down_5)
     res_concatenate_1 = res_concatenate(dilation_down_4 ,pixel_shuffle_up_1)
@@ -327,20 +327,20 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
 
     pixel_shuffle_up_2 = pixel_shuffle_up(dilation_block_up_1)
     res_concatenate_2 = res_concatenate(dilation_down_3, pixel_shuffle_up_2)
-    dilation_block_up_2 = dilation_up_block(res_concatenate_2, filters=256)
+    dilation_block_up_2 = dilation_up_block(res_concatenate_2, filters=128)
 
     pixel_shuffle_up_3 = pixel_shuffle_up(dilation_block_up_2)
     res_concatenate_3 = res_concatenate(dilation_down_2, pixel_shuffle_up_3)
-    dilation_block_up_3 = dilation_up_block(res_concatenate_3, filters=128)
+    dilation_block_up_3 = dilation_up_block(res_concatenate_3, filters=64)
 
     pixel_shuffle_up_4 = pixel_shuffle_up(dilation_block_up_3)
     res_concatenate_4 = res_concatenate(dilation_down_1, pixel_shuffle_up_4)
-    dilation_block_up_4 = dilation_up_block(res_concatenate_4, filters=64)
+    dilation_block_up_4 = dilation_up_block(res_concatenate_4, filters=32)
 
-    dense_1 = conv2d_layer(dilation_block_up_4, filters=64, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
+    dense_1 = conv2d_layer(dilation_block_up_4, filters=32, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
                                    activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
 
-    dense_2 = conv2d_layer(dense_1, filters=32, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
+    dense_2 = conv2d_layer(dense_1, filters=16, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
                                    activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
 
     dense_3 = conv2d_layer(dense_2, filters=1, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
@@ -355,7 +355,7 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     model.summary()
     return model
 
-# ResLSTM()
+ResLSTM()
 
 
 
