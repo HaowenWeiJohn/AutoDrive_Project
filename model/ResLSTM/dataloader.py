@@ -74,7 +74,7 @@ class CustomDataGen(tf.keras.utils.Sequence):
         return y
 
     def __get_data(self, batches):
-
+        print(batches)
         x_batch_files = batches[self.X_col]
         y_batch_files = batches[self.y_col]
 
