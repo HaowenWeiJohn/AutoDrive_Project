@@ -315,7 +315,7 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     dilation_down_3 = dilation_down_block(down_sampling_2, filters=128)
     down_sampling_3 = down_average_pool_block(dilation_down_3)
 
-    dilation_down_4 = dilation_down_block(down_sampling_3, filters=256)
+    dilation_down_4 = dilation_down_block(down_sampling_3, filters=128)
     down_sampling_4 = down_average_pool_block(dilation_down_4)
 
 
@@ -323,7 +323,7 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
 
     pixel_shuffle_up_1 = pixel_shuffle_up(dilation_down_5)
     res_concatenate_1 = res_concatenate(dilation_down_4 ,pixel_shuffle_up_1)
-    dilation_block_up_1 = dilation_up_block(res_concatenate_1, filters=256)
+    dilation_block_up_1 = dilation_up_block(res_concatenate_1, filters=128)
 
     pixel_shuffle_up_2 = pixel_shuffle_up(dilation_block_up_1)
     res_concatenate_2 = res_concatenate(dilation_down_3, pixel_shuffle_up_2)
