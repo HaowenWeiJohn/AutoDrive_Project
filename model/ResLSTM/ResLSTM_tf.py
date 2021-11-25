@@ -343,10 +343,12 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     dense_2 = conv2d_layer(dense_1, filters=16, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
                                    activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
 
-    dense_3 = conv2d_layer(dense_2, filters=1, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
-                                   activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
+    # dense_3 = conv2d_layer(dense_2, filters=3, kernal_size=(1,1), dilation_rate=(1,1), padding='same',
+    #                                activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True)
 
-    output = Conv2D(1, 1, activation='sigmoid')(dense_3)
+    logistic = Conv2D(filters=3, kernel_size=(1,1), activation='sigmoid')(dense_2)
+
+    output = tf.keras.layers.Softmax(axis=-1)(logistic)
 
     model = Model(input, output)
 
@@ -355,7 +357,7 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     model.summary()
     return model
 
-ResLSTM()
+# ResLSTM()
 
 
 

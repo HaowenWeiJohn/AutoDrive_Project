@@ -293,3 +293,13 @@ def sem_label_transform(raw_label_map, label_transfer_dict):
     pre_map = raw_label_map == i
     raw_label_map[pre_map] = label_transfer_dict[i]
   return raw_label_map
+
+
+def depth_onehot(matrix, category, on_value=1, off_value=0):
+  x = matrix.shape[0]
+  y = matrix.shape[1]
+  output = np.full((x, y, len(category)), off_value)
+  for ix, iy in np.ndindex(matrix.shape):
+    value = matrix[ix, iy]
+    output[ix, iy, category.index(value)] = on_value
+  return output
