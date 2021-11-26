@@ -8,6 +8,7 @@ import tensorflow as tf
 from tensorflow.python.layers.convolutional import Conv2DTranspose
 
 from model.ResLSTM.loss import Custom_loss
+from model.ResLSTM.metrics import MOS_IoU
 
 
 def time_dis_conv2d(input, filters=64 ,kernal_size=(3,3), dilation_rate=(1,1), padding='same',
@@ -361,8 +362,9 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     #     reduction=losses_utils.ReductionV2.AUTO,
     #     name='categorical_crossentropy'
     # )
-
-    model.compile(optimizer=adam, loss=Custom_loss, metrics=['accuracy'])
+    custom_loss = Custom_loss(class_weight=[0, 9, 251])
+    mos_iou = MOS_IoU()
+    model.compile(optimizer=adam, loss=custom_loss, metrics=[mos_iou])
     model.summary()
     return model
 
