@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+from tensorflow.python.framework import dtypes
 from tensorflow.python.keras import Input, Model
 from tensorflow.python.keras.backend import concatenate
 from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Dropout, UpSampling2D, TimeDistributed, ConvLSTM2D, \
@@ -24,11 +25,11 @@ class Custom_loss(tf.keras.losses.Loss):
 
     def call(self, y_true, y_pred):
         # y = (batch_size, 64, 2048, 3)
-
+        print(np.array(y_pred))
         flatten = tf.reshape(y_pred, (-1, y_pred.shape[-1]))
         # loss = self.cce(y_true, y_pred)
         tensor_1 = -tf.reduce_sum(class_weight*flatten*tf.math.log(y_pred))
-        tensor_2 = tf.size(y_pred)
+        tensor_2 = tf.size(y_pred, out_type=dtypes.float32)
         print('pred:', y_pred)
         print('tesnor_2:', tensor_2)
         weighted_categorical_cross_entropy = tf.divide(tensor_1, tensor_2)
