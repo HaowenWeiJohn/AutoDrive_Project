@@ -29,7 +29,7 @@ class Custom_loss(tf.keras.losses.Loss):
         # loss = self.cce(y_true, y_pred)
 
         weighted_categorical_cross_entropy = tf.math.divide(-tf.reduce_sum(class_weight*flatten*tf.math.log(y_pred)),
-                                                             tf.size(y_pred, out_type=tf.float64))
+                                                             tf.size(y_pred, out_type=tf.int64))
 
         lovasz = lovasz_softmax(probas=y_pred, labels=y_true, classes='present', per_image=False, ignore=None, order='BHWC')
 
