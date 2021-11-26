@@ -29,9 +29,9 @@ class Custom_loss(tf.keras.losses.Loss):
         flatten = tf.reshape(y_pred, (-1, y_pred.shape[-1]))
         # loss = self.cce(y_true, y_pred)
         tensor_1 = -tf.reduce_sum(class_weight*flatten*tf.math.log(y_pred))
-        tensor_2 = tf.size(y_pred, out_type=dtypes.float32)
-        print('pred:', y_pred)
-        print('tesnor_2:', tensor_2)
+        tensor_2 = tf.cast(tf.size(y_pred), dtype=dtypes.float32)
+        # print('pred:', y_pred)
+        # print('tesnor_2:', tensor_2)
         weighted_categorical_cross_entropy = tf.divide(tensor_1, tensor_2)
 
         lovasz = lovasz_softmax(probas=y_pred, labels=y_true, classes='present', per_image=False, ignore=None, order='BHWC')

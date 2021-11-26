@@ -13,17 +13,22 @@ class MOS_IoU(tf.keras.metrics.Metric):
   def __init__(self, name='mos_iou', ignore_class=0, **kwargs):
     super(MOS_IoU, self).__init__(name=name, **kwargs)
     self.mos_iou = self.add_weight(name='mos_iou', initializer='zeros')
-    self.m = tf.keras.metrics.MeanIoU(num_classes=2)
+    self.m = tf.keras.metrics.MeanIoU(num_classes=3)
 
   def update_state(self, y_true, y_pred, sample_weight=None):
-    y_true_flatten = tf.reshape(y_true, (-1, y_true.shape[-1]))
-    y_pred_flatten = tf.reshape(y_pred, (-1, y_pred.shape[-1]))
+    y_true_flatten = tf.reshape(y_true, (-1, tf.shape(y_true)[-1]))
+    y_pred_flatten = tf.reshape(y_pred, (-1, tf.shape(y_pred)[-1]))
+    # print(tf.shape(y_true_flatten))
 
     y_true_index = tf.math.argmax(y_true_flatten, axis=-1)
     y_pred_index = tf.math.argmax(y_pred_flatten, axis=-1)
 
-    y_true_index[y_true_index==0] = 1
-    y_pred_index[y_pred_index == 0] = 1
+    # y_true_index = y_true_index.numpy()
+    # y_pred_index = y_pred_index.numpy()
+
+    # print('Y', y_true)
+    # y_true_index[y_true_index==0] = 1
+    # y_pred_index[y_pred_index == 0] = 1
     # [0, 1, 2]
 
     # y_true = tf.cast(y_true, tf.bool)
@@ -37,7 +42,7 @@ class MOS_IoU(tf.keras.metrics.Metric):
     #   values = tf.multiply(values, sample_weight)
 
     self.m.update_state(y_true_index, y_pred_index)
-    mos_iou = self.m.result().numpy()
+    mos_iou = self.m.result()
     self.mos_iou.assign_add(mos_iou)
 
   def result(self):
