@@ -25,7 +25,7 @@ class Custom_loss(tf.keras.losses.Loss):
 
     def call(self, y_true, y_pred):
         # y = (batch_size, 64, 2048, 3)
-        print(y_pred.numpy())
+        # print(y_pred.numpy())
         flatten = tf.reshape(y_pred, (-1, y_pred.shape[-1]))
         # loss = self.cce(y_true, y_pred)
         tensor_1 = -tf.reduce_sum(class_weight*flatten*tf.math.log(y_pred))
