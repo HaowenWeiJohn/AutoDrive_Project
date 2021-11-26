@@ -10,9 +10,9 @@ import tensorflow as tf
 
 class MOS_IoU(tf.keras.metrics.Metric):
 
-  def __init__(self, name='MOS_IoU', ignore_class=0, **kwargs):
+  def __init__(self, name='mos_iou', ignore_class=0, **kwargs):
     super(MOS_IoU, self).__init__(name=name, **kwargs)
-    self.mos_iou = self.add_weight(name='MOS_IoU', initializer='zeros')
+    self.mos_iou = self.add_weight(name='mos_iou', initializer='zeros')
     mean_iou = tf.keras.metrics.MeanIoU(num_classes=2)
 
   def update_state(self, y_true, y_pred, sample_weight=None):
