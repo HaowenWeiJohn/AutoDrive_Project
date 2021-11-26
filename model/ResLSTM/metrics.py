@@ -13,7 +13,7 @@ class MOS_IoU(tf.keras.metrics.Metric):
   def __init__(self, name='mos_iou', ignore_class=0, **kwargs):
     super(MOS_IoU, self).__init__(name=name, **kwargs)
     self.mos_iou = self.add_weight(name='mos_iou', initializer='zeros')
-    mean_iou = tf.keras.metrics.MeanIoU(num_classes=2)
+    self.m = tf.keras.metrics.MeanIoU(num_classes=2)
 
   def update_state(self, y_true, y_pred, sample_weight=None):
     y_true_flatten = tf.reshape(y_true, (-1, y_true.shape[-1]))
@@ -22,6 +22,8 @@ class MOS_IoU(tf.keras.metrics.Metric):
     y_true_index = tf.math.argmax(y_true_flatten, axis=-1)
     y_pred_index = tf.math.argmax(y_pred_flatten, axis=-1)
 
+    y_true_index[y_true_index==0] = 1
+    y_pred_index[y_pred_index == 0] = 1
     # [0, 1, 2]
 
     # y_true = tf.cast(y_true, tf.bool)

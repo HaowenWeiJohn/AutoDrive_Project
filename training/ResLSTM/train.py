@@ -34,7 +34,7 @@ csv_logger = CSVLogger(filename='train_save/history.csv',
 
 mc = ModelCheckpoint(
     filepath='train_save/test_model.h5',
-    monitor='val_accuracy', mode='max', verbose=1, save_best_only=True)
+    monitor='mos_iou', mode='max', verbose=1, save_best_only=True)
 
 # make data generator
 x_train_dir = '../../data/pesudo_train_test_val/val/x'
