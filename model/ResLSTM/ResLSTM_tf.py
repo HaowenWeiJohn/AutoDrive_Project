@@ -363,7 +363,7 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     #     name='categorical_crossentropy'
     # )
     custom_loss = Custom_loss(class_weight=[0, 9, 251])
-    mos_iou = MOS_IoU()
+    mos_iou = MOS_IoU(name='mos_iou')
     model.compile(optimizer=adam, loss=custom_loss, metrics=[mos_iou])
     model.summary()
     return model
