@@ -322,7 +322,7 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     down_sampling_4 = down_average_pool_block(dilation_down_4)
 
 
-    dilation_down_5 = dilation_down_block(down_sampling_4, filters=256)
+    dilation_down_5 = dilation_down_block(down_sampling_4, filters=128)
 
     pixel_shuffle_up_1 = pixel_shuffle_up(dilation_down_5)
     res_concatenate_1 = res_concatenate(dilation_down_4 ,pixel_shuffle_up_1)
