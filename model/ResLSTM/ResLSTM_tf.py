@@ -7,6 +7,8 @@ import tensorflow as tf
 # input size (w,h,n)    n is back track images at time t, in this case we deal it as channel
 from tensorflow.python.layers.convolutional import Conv2DTranspose
 
+from model.ResLSTM.loss import Custom_loss
+
 
 def time_dis_conv2d(input, filters=64 ,kernal_size=(3,3), dilation_rate=(1,1), padding='same',
                                activation=tf.keras.layers.LeakyReLU(alpha=0.1), batch_norm=True):
@@ -353,11 +355,18 @@ def ResLSTM(input_shape = (5, 64, 2048, 9)):
     model = Model(input, output)
 
     adam = tf.keras.optimizers.Adam(learning_rate=1e-3, decay=1e-5)
-    model.compile(optimizer=adam, loss='binary_crossentropy', metrics=['accuracy'])
+    #
+    # tf.keras.losses.CategoricalCrossentropy(
+    #     from_logits=False, label_smoothing=0.0, axis=-1,
+    #     reduction=losses_utils.ReductionV2.AUTO,
+    #     name='categorical_crossentropy'
+    # )
+
+    model.compile(optimizer=adam, loss=Custom_loss, metrics=['accuracy'])
     model.summary()
     return model
 
-# ResLSTM()
+ResLSTM()
 
 
 

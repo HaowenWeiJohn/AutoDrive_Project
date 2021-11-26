@@ -67,9 +67,9 @@ class CustomDataGen(tf.keras.utils.Sequence):
     def __get_output(self, path):
         y = np.load(path)
         # y preprocessing
-        y[y <=1] = 0
-        y[y >=1] = 1
-        y = np.expand_dims(y, axis=-1)
+        # y[y <=1] = 0
+        # y[y >=1] = 1
+        # y = np.expand_dims(y, axis=-1)
         # return tf.keras.utils.to_categorical(label, num_classes=num_classes)
         return y
 
@@ -96,16 +96,16 @@ class CustomDataGen(tf.keras.utils.Sequence):
 
 # # create data file
 #
-# x_dir = '../../data/train_test_val/val/x'
-# y_dir = '../../data/train_test_val/val/y'
-# #
-# # x_files = load_files(x_dir)
-# # y_files = load_files(y_dir)
-# #
-# # # create_data_frame
-# # dict = {'x_files': x_files, 'y_files': y_files}
-# # df = pd.DataFrame(data=dict)
+x_dir = '../../data/train_test_val/val/x'
+y_dir = '../../data/train_test_val/val/y'
 #
-# data_gen = CustomDataGen(df=None, X_dir=x_dir, y_dir=y_dir, X_col='x_files', y_col='y_files', batch_size=10, shuffle=True)
-# data_gen.__getitem__(index=20)
-# data_gen.on_epoch_end()
+# x_files = load_files(x_dir)
+# y_files = load_files(y_dir)
+#
+# # create_data_frame
+# dict = {'x_files': x_files, 'y_files': y_files}
+# df = pd.DataFrame(data=dict)
+
+data_gen = CustomDataGen(df=None, X_dir=x_dir, y_dir=y_dir, X_col='x_files', y_col='y_files', batch_size=10, shuffle=True)
+data_gen.__getitem__(index=20)
+data_gen.on_epoch_end()
