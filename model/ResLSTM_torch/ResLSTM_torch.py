@@ -28,9 +28,9 @@ class ResLSTM(nn.Module):
         x = self.tdconv2(x)
         x = self.tdconv3(x)
 
-        x = self.convlstm1()
-        last_state_list, layer_output = self.convlstm1(x)
+        x = self.convlstm1(x)
+        last_state_list, layer_output = self.convlstm1(x) # list of layer output
 
         output = self.salsanext(last_state_list[0])
 
-        return output
+        return output # logistic output
