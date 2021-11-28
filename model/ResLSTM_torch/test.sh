@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="TimeDis.py"
+#SBATCH --job-name="test_train.txt"
 #SBATCH -D .
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
