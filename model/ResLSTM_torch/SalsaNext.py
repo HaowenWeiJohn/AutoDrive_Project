@@ -172,7 +172,7 @@ class SalsaNext(nn.Module):
         super(SalsaNext, self).__init__()
         self.nclasses = nclasses
 
-        self.downCntx = ResContextBlock(5, 32)
+        self.downCntx = ResContextBlock(32, 32)
         self.downCntx2 = ResContextBlock(32, 32)
         self.downCntx3 = ResContextBlock(32, 32)
 
@@ -206,6 +206,6 @@ class SalsaNext(nn.Module):
         up1e = self.upBlock4(up2e, down0b)
         logits = self.logits(up1e)
 
-        logits = logits
-        logits = F.softmax(logits, dim=1)
+        # logits = logits
+        # logits = F.softmax(logits, dim=1)
         return logits
