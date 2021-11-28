@@ -1,14 +1,21 @@
 # import __init__ as booger
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
 
 from model.ResLSTM_torch.Lovasz_Softmax import Lovasz_softmax
 from model.ResLSTM_torch.ResLSTM_torch import ResLSTM
 
 nclasses = 3
 
+print(torch.cuda.is_available())
+print(torch.cuda.current_device())
+print(torch.cuda.get_device_name(0))
 device = torch.device('cuda:0')
+
 
 ResLSTM_model = ResLSTM(nclasses)
 ResLSTM_model.to(device)
