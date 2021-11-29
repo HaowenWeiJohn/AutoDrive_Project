@@ -17,8 +17,7 @@ print(torch.cuda.get_device_name(0))
 device = torch.device('cuda:0')
 
 
-ResLSTM_model = ResLSTM(nclasses)
-ResLSTM_model.to(device)
+ResLSTM_model = ResLSTM(nclasses).to(device)
 
 weight = [0,9,251]
 weight=torch.tensor(weight).to(device)
