@@ -38,7 +38,8 @@ for current_epoch in range(0, 100):
     print('Epoch: ', current_epoch)
 
     for batch_index in range(0,100):
-        input_tensor = torch.randn(N, T, C, 64, 2048).to(dtype=torch.long).to(device)
+
+        input_tensor = torch.randn(N, T, C, 64, 2048).to(device)
         semantic_label = torch.empty(N, 1, 64, 2048).to(dtype=torch.long)
         semantic_label_mask = torch.empty(N, 1, 64, 2048).to(dtype=torch.long)
 
@@ -46,7 +47,7 @@ for current_epoch in range(0, 100):
         semantic_label_mask = torch.squeeze(semantic_label_mask, dim=1)
         with torch.cuda.amp.autocast(enabled=True):
             print('John1')
-            semantic_output = ResLSTM_model(input_tensor) # (b, c, h, w)
+            semantic_output = ResLSTM_model(input_tensor.float()) # (b, c, h, w)
             pixel_losses = WCE(semantic_output, semantic_label)
             print('John2')
             pixel_losses = pixel_losses* semantic_label_mask.to(device)
