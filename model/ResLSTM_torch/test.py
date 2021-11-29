@@ -38,7 +38,7 @@ for current_epoch in range(0, 100):
 
     for batch_index in range(0,100):
 
-        input_tensor = torch.randn(N, T, C, 64, 2048).to(device)
+        input_tensor = torch.randn(N, T, C, 64, 2048, device=device)
         semantic_label = torch.empty(N, 1, 64, 2048).to(dtype=torch.long)
         semantic_label_mask = torch.empty(N, 1, 64, 2048).to(dtype=torch.long)
 
