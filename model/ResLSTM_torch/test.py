@@ -46,7 +46,7 @@ for current_epoch in range(0, 100):
         semantic_label_mask = torch.squeeze(semantic_label_mask, dim=1)
         with torch.cuda.amp.autocast(enabled=True):
             print('John1')
-            semantic_output = ResLSTM_model(input_tensor.float()) # (b, c, h, w)
+            semantic_output = ResLSTM_model(input_tensor) # (b, c, h, w)
             pixel_losses = WCE(semantic_output, semantic_label)
             print('John2')
             pixel_losses = pixel_losses* semantic_label_mask.to(device)
