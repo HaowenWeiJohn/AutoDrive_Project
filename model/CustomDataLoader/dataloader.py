@@ -2,6 +2,9 @@
 # import __init__ as booger
 import os
 import sys
+
+import numpy as np
+
 sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
 import torch
 import torch.nn as nn
@@ -28,15 +31,31 @@ class Custom_DataLoader(Dataset):
 
     def __getitem__(self, index):
 
-        x = 1 # read index
-        y = 2 # read index
-        y_mask = 3
+        # x = np.array([1,2,3]) # read index
+        # y = np.array([1,2,3]) # read index
+        # y_mask = np.array([1,2,3])
+        x = np.load(self.data_files[index])
+        x = self.input_preprocessing(x)
+        y = np.load(self.label_files[index], allow_pickle=True)
+        y_label = y[0]
+        y_onehot = y[1]
+        # y_mask = torch.from_numpy(y_mask)
 
-        x = torch.from_numpy(x)
-        y = torch.from_numpy(y)
-        y_mask = torch.from_numpy(y_mask)
-
-        return x, y, y_mask
+        return torch.from_numpy (x), torch.from_numpy(y_label).to(dtype=torch.long)
 
 
         # if self.transform
+
+    def input_preprocessing(self, x):
+        current_frame = x[0:5, :, :]
+
+        lstm_1 = np.append(current_frame, x[9:13, :, :], axis=0)
+        lstm_2 = np.append(current_frame, x[8:12, :, :], axis=0)
+        lstm_3 = np.append(current_frame, x[7:11, :, :], axis=0)
+        lstm_4 = np.append(current_frame, x[6:10, :, :], axis=0)
+        lstm_5 = np.append(current_frame, x[5:9 , :, :], axis=0)
+
+        x = [lstm_1, lstm_2, lstm_3, lstm_4, lstm_5]
+        x = np.array(x)
+
+        return x

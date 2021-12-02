@@ -33,7 +33,7 @@ weight=torch.tensor(weight).to(device)
 
 WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(device)
 # NLL = nn.NLLLoss(weight=weight).to(device)
-LS = Lovasz_softmax().to(device)
+LS = Lovasz_softmax(ignore=0).to(device)
 
 optimizer = torch.optim.AdamW(ResLSTM_model.parameters(), lr=0.001,weight_decay=0.0005)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
@@ -56,34 +56,34 @@ val_loader = DataLoader(dataset=val_dataset, batch_size=2, shuffle=True)
 
 N, T, C = 3, 5, 9
 
-input_tensor = torch.randn(N, T, C, 16, 16).to(device)
-semantic_label = np.zeros((N, 1, 16, 16))
-semantic_label = torch.from_numpy(semantic_label).to(dtype=torch.long)
-semantic_label_mask = torch.ones(N, 1, 16, 16).to(dtype=torch.long)
+# input_tensor = torch.randn(N, T, C, 16, 16).to(device)
+# semantic_label = np.zeros((N, 1, 16, 16))
+# semantic_label = torch.from_numpy(semantic_label).to(dtype=torch.long)
+# semantic_label_mask = torch.ones(N, 1, 16, 16).to(dtype=torch.long)
 
 for current_epoch in tqdm(range(0, 100)):
 
     print('Epoch: ', current_epoch)
+    print(optimizer.param_groups[0]['lr'])
 
-    for batch_index in range(0,10):
-        print(optimizer.param_groups[0]['lr'])
+    for batch_index, (semantic_input, semantic_label) in enumerate(train_loader):
+        semantic_input = semantic_input.to(device)
+        semantic_label = semantic_label.to(device)
+        # print(optimizer.param_groups[0]['lr'])
         # print('batch_index:', batch_index)
-
-
-        semantic_label = torch.squeeze(semantic_label, dim=1).to(device)
-        semantic_label_mask = torch.squeeze(semantic_label_mask, dim=1)
+        # semantic_label = torch.squeeze(semantic_label, dim=1).to(device)
+        # semantic_label_mask = torch.squeeze(semantic_label_mask, dim=1)
         with torch.cuda.amp.autocast(enabled=True):
-            semantic_output = ResLSTM_model(input_tensor) # (b, c, h, w)
-            pixel_losses = WCE(semantic_output, semantic_label)
-            print(pixel_losses)
-            pixel_losses = pixel_losses.to(device)
+            semantic_output = ResLSTM_model(semantic_input) # (b, c, h, w)
+            pixel_losses = WCE(semantic_output, semantic_label).to(device)
+            # print(pixel_losses)
+            # pixel_losses = pixel_losses.to(device)
             pixel_losses = pixel_losses.contiguous().view(-1)
             loss_ce = pixel_losses.mean()
-            print(loss_ce)
 
         LS_loss = LS(semantic_output, semantic_label)
         total_loss = loss_ce +  LS_loss.mean()
-        # print(total_loss)
+        print('Loss: ', total_loss)
 
         optimizer.zero_grad()
         scaler.scale(total_loss).backward()

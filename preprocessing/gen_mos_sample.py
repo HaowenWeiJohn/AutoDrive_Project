@@ -44,7 +44,7 @@ for sequence in sequences:
         for back_track_n in back_track_ns:
             res_image_path = os.path.join(sequence_folder, 'residual_images_'+str(back_track_n), sample_file_name)
             res_image = np.load(res_image_path)
-            sample = np.append(sample, np.expand_dims(res_image, 0))
+            sample = np.append(sample, np.expand_dims(res_image, 0), axis=0)
 
         np.save(sample_save_file_name, sample)
 # test_sequences = [8]
