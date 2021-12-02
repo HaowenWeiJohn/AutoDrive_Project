@@ -111,7 +111,7 @@ class TimeDistributed(nn.Module):
 
     def forward(self, x):
         batch_size, time_steps, C, H, W = x.size()
-        output = torch.tensor([])
+        output = torch.tensor([], device='cuda:0')
         for i in range(time_steps):
             output_t = self.layers[i](x[:, i, :, :, :])
             output_t = output_t.unsqueeze(1)

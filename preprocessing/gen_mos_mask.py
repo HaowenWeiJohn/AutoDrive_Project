@@ -84,8 +84,9 @@ for frame_idx in tqdm(range(len(scan_paths))):
         plt.close()
 
     # save to npy file
-    label_new = depth_onehot(matrix=label_new, category=[0, 1, 2], on_value=1, off_value=0)
-    np.save(mask_file_name, label_new)
+    label_new_one_hot = depth_onehot(matrix=label_new, category=[0, 1, 2], on_value=1, off_value=0, channel_first=True)
+
+    np.save(mask_file_name, [label_new, label_new_one_hot])
 
 
 

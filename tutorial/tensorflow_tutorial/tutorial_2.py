@@ -39,10 +39,15 @@ test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=Tr
 model = NN(input_size=input_size, num_classes=num_classes).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
 
 for epoch in range(num_epoch):
     print(epoch)
+    print(optimizer.param_groups[0]['lr'])
     for batch_idex, (data, target) in enumerate(train_loader):
+
+        # for param_group in optimizer.param_groups:
+        #     print(param_group)
         data = data.to(device=device)
         target = target.to(device=device)
 
@@ -55,6 +60,7 @@ for epoch in range(num_epoch):
         optimizer.zero_grad() # does not store  the grad from previous
         loss.backward()
         optimizer.step()
+    scheduler.step()
 
 
 # check the accuracy

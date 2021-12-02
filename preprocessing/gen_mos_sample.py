@@ -37,13 +37,14 @@ for sequence in sequences:
     for sample_file_name in tqdm(samples_file_name):
         range_image_path = os.path.join(samples_folder, sample_file_name)
         sample = np.load(range_image_path)
+        sample = np.moveaxis(sample, -1, 0)
         x_folder = os.path.join(folder_name, 'x')
         sample_save_file_name = os.path.join(data_folder, folder_name, sample_file_name)
         # res images
         for back_track_n in back_track_ns:
             res_image_path = os.path.join(sequence_folder, 'residual_images_'+str(back_track_n), sample_file_name)
             res_image = np.load(res_image_path)
-            sample = np.dstack((sample, np.expand_dims(res_image, -1)))
+            sample = np.append(sample, np.expand_dims(res_image, 0))
 
         np.save(sample_save_file_name, sample)
 # test_sequences = [8]

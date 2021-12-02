@@ -207,5 +207,5 @@ class SalsaNext(nn.Module):
         logits = self.logits(up1e)
 
         # logits = logits
-        # logits = F.softmax(logits, dim=1)
+        logits = F.softmax(logits, dim=1)
         return logits
