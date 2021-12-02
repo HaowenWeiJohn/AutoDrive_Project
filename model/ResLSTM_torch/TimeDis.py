@@ -116,4 +116,5 @@ class TimeDistributed(nn.Module):
             output_t = self.layers[i](x[:, i, :, :, :])
             output_t = output_t.unsqueeze(1)
             output = torch.cat((output, output_t), 1)
+            # print(output)
         return output

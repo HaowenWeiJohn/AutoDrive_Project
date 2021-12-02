@@ -16,7 +16,7 @@ num_last_ns: [1,2,3,4,5,6,7,8]
 # Inputs
 # the folder of raw LiDAR scans
 data_folder: '../data/sequences/'
-sequences: '08'
+sequences: ['08']
 
 scan_folder: 'velodyne'
 # ground truth poses file
