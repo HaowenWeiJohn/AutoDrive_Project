@@ -54,7 +54,7 @@ train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 train_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 val_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 
-train_loader = DataLoader(dataset=train_dataset, batch_size=1, shuffle=True)
+train_loader = DataLoader(dataset=train_dataset, batch_size=4, shuffle=True)
 val_loader = DataLoader(dataset=val_dataset, batch_size=1, shuffle=True)
 #################
 
@@ -110,13 +110,13 @@ for current_epoch in range(0, 100):
         # scaler.update()
         # break
 
-    if current_epoch % validation_step == 0:
-        precision, miou = val(BiSeNet_MOS, val_loader)
-        print('precision: ', str(precision), 'miou', miou)
-        if miou > max_miou:
-            max_miou = miou
-            torch.save(BiSeNet_MOS,
-                       'save/BiSeNet_model_state_dict')
+    # if current_epoch % validation_step == 0:
+    #     precision, miou = val(BiSeNet_MOS, val_loader)
+    #     print('precision: ', str(precision), 'miou', miou)
+    #     if miou > max_miou:
+    #         max_miou = miou
+    #         torch.save(BiSeNet_MOS,
+    #                    'save/BiSeNet_model_state_dict')
 
 
 
