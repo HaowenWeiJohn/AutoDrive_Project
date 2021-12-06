@@ -1,6 +1,7 @@
 # import __init__ as booger
 import os.path
 import sys
+import time
 
 sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
 
@@ -35,7 +36,7 @@ WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(de
 # NLL = nn.NLLLoss(weight=weight).to(device)
 LS = Lovasz_softmax(ignore=0).to(device)
 
-optimizer = torch.optim.AdamW(ResLSTM_model.parameters(), lr=0.001,weight_decay=0.0005)
+optimizer = torch.optim.AdamW(ResLSTM_model.parameters(), lr=0.0001,weight_decay=0.00001)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
 
 scaler = torch.cuda.amp.GradScaler()
@@ -49,8 +50,8 @@ train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 train_dataset = Custom_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 val_dataset = Custom_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 
-train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True)
-val_loader = DataLoader(dataset=val_dataset, batch_size=2, shuffle=True)
+train_loader = DataLoader(dataset=train_dataset, batch_size=8, shuffle=True, num_workers=2)
+val_loader = DataLoader(dataset=val_dataset, batch_size=8, shuffle=True, num_workers=2)
 #################
 
 
@@ -60,12 +61,14 @@ N, T, C = 3, 5, 9
 # semantic_label = np.zeros((N, 1, 16, 16))
 # semantic_label = torch.from_numpy(semantic_label).to(dtype=torch.long)
 # semantic_label_mask = torch.ones(N, 1, 16, 16).to(dtype=torch.long)
+# batch_iteration = tqdm(train_loader)
 
-for current_epoch in tqdm(range(0, 100)):
+epoch_loss = []
+for current_epoch in range(0, 100):
 
     print('Epoch: ', current_epoch)
     print(optimizer.param_groups[0]['lr'])
-
+    batch_loss = []
     for batch_index, (semantic_input, semantic_label) in enumerate(train_loader):
         semantic_input = semantic_input.to(device)
         semantic_label = semantic_label.to(device)
@@ -83,12 +86,20 @@ for current_epoch in tqdm(range(0, 100)):
 
         LS_loss = LS(semantic_output, semantic_label)
         total_loss = loss_ce +  LS_loss.mean()
-        print('Loss: ', total_loss)
-
+        # print('Loss: ', total_loss)
         optimizer.zero_grad()
         scaler.scale(total_loss).backward()
         scaler.step(optimizer)
         scaler.update()
+        batch_loss.append(total_loss.item())
+        # batch_iteration.set_description('loss: '+ str(total_loss))
+        # batch_loss.append(total_loss.item())
+        print('Epoch: %s,  Batch Index: %s, Total Loss: %s' % (str(current_epoch), str(batch_index), str(total_loss) ))
+    torch.save(ResLSTM_model.state_dict(), 'save/ResLSTM_model_state_dict')
+    epoch_loss.append(np.average(batch_loss))
+    np.save('loss_his', np.array(epoch_loss))
+    print(epoch_loss)
+    # print('Epoch: %s,  Batch Index: %s, Total Loss: %s' % (str(current_epoch), str(batch_index), str(total_loss) ))
 
 
 

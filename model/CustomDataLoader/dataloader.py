@@ -2,6 +2,7 @@
 # import __init__ as booger
 import os
 import sys
+import time
 
 import numpy as np
 
@@ -34,12 +35,16 @@ class Custom_DataLoader(Dataset):
         # x = np.array([1,2,3]) # read index
         # y = np.array([1,2,3]) # read index
         # y_mask = np.array([1,2,3])
+
         x = np.load(self.data_files[index])
-        x = self.input_preprocessing(x)
         y = np.load(self.label_files[index], allow_pickle=True)
+        # current = time.time()
+
+        x = self.input_preprocessing(x)
         y_label = y[0]
         y_onehot = y[1]
         # y_mask = torch.from_numpy(y_mask)
+        # print('use: ', str(time.time()-current))
 
         return torch.from_numpy (x), torch.from_numpy(y_label).to(dtype=torch.long)
 
