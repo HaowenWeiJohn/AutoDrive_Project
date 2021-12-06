@@ -17,7 +17,5 @@ qimage2ndarray~=1.8.3
 DateTime~=4.3
 scikit-learn~=0.24.2
 pandas~=1.3.0
-torch~=1.9.1+cu111
 tqdm~=4.62.3
 PyYAML~=6.0
-torchvision~=0.10.1+cu111

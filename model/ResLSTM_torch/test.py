@@ -12,7 +12,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from model.CustomDataLoader.dataloader import Custom_DataLoader
+from model.CustomDataLoader.dataloader import ResLSTM_DataLoader
 from config.training_config import root_data_dir
 
 
@@ -28,6 +28,8 @@ device = torch.device('cuda:0')
 
 
 ResLSTM_model = ResLSTM(nclasses).to(device)
+pytorch_total_params = sum(p.numel() for p in ResLSTM_model.parameters())
+
 print(torch.cuda.memory_summary())
 weight = [0, 9.0, 251.0]
 weight=torch.tensor(weight).to(device)
@@ -47,11 +49,11 @@ scaler = torch.cuda.amp.GradScaler()
 train_data_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'x')
 train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 
-train_dataset = Custom_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
-val_dataset = Custom_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
+train_dataset = ResLSTM_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
+val_dataset = ResLSTM_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 
-train_loader = DataLoader(dataset=train_dataset, batch_size=8, shuffle=True, num_workers=2)
-val_loader = DataLoader(dataset=val_dataset, batch_size=8, shuffle=True, num_workers=2)
+train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=2, shuffle=True)
 #################
 
 
