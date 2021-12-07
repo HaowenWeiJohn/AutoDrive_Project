@@ -4,7 +4,7 @@ from build_contextpath import build_contextpath
 from torch.nn.functional import interpolate
 import warnings
 
-from model.ResLSTM_torch.SalsaNext import ResContextBlock
+from model.SalsaNext.SalsaNext import ResContextBlock
 
 warnings.filterwarnings(action='ignore')
 
@@ -197,7 +197,6 @@ if __name__ == '__main__':
     # for key, params in model.named_parameters():
     #     if 'bn' in key:
     #         params.requires_grad = False
-    from utils import group_weight
     # params_list = []
     # for module in model.mul_lr:
     #     params_list = group_weight(params_list, module, nn.BatchNorm2d, 10)

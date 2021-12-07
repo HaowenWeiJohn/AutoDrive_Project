@@ -1,7 +1,7 @@
 import torch
 from torchvision import models
 
-from model.ResLSTM_torch.SalsaNext import ResContextBlock
+from model.SalsaNext.SalsaNext import ResContextBlock
 
 
 class resnet18(torch.nn.Module):

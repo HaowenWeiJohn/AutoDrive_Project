@@ -20,7 +20,7 @@ from build_BiSeNet import BiSeNet
 from model.ResLSTM_torch.Lovasz_Softmax import Lovasz_softmax
 
 nclasses = 3
-weight = [0, 9.0, 251.0]
+weight = [0.0, 9.0, 251.0]
 validation_step = 3
 max_miou = 0
 
@@ -36,14 +36,14 @@ print(torch.cuda.memory_summary())
 
 weight=torch.tensor(weight).to(device)
 
-WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(device)
+WCE = nn.CrossEntropyLoss(weight=weight, reduction='none').to(device)
 # NLL = nn.NLLLoss(weight=weight).to(device)
 LS = Lovasz_softmax(ignore=0).to(device)
 
-optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=0.0001,weight_decay=0.0001)
+optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-4,weight_decay=1e-7)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
 
-scaler = torch.cuda.amp.GradScaler()
+# scaler = torch.cuda.amp.GradScaler()
 
 
 #################
@@ -54,7 +54,7 @@ train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 train_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 val_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 
-train_loader = DataLoader(dataset=train_dataset, batch_size=1, shuffle=True)
+train_loader = DataLoader(dataset=train_dataset, batch_size=4, shuffle=True)
 val_loader = DataLoader(dataset=val_dataset, batch_size=1, shuffle=True)
 #################
 
@@ -77,13 +77,11 @@ for current_epoch in range(0, 100):
 
         output, output_sup1, output_sup2 = BiSeNet_MOS(semantic_input)
 
-        loss1 = WCE(output, semantic_label).to(device)
-        loss2 = WCE(output_sup1, semantic_label).to(device)
-        loss3 = WCE(output_sup2, semantic_label).to(device)
+        pixel_loss1 = WCE(output, semantic_label).to(device)
+        pixel_loss2 = WCE(output_sup1, semantic_label).to(device)
+        pixel_loss3 = WCE(output_sup2, semantic_label).to(device)
 
-        total_loss = loss1 + loss2 + loss3
-
-
+        total_pixel_loss = pixel_loss1+pixel_loss2+pixel_loss3
 
 
         # semantic_output = BiSeNet_MOS(semantic_input) # (b, c, h, w)
@@ -99,24 +97,28 @@ for current_epoch in range(0, 100):
         # LS_loss = LS(semantic_output, semantic_label)
         # total_loss = loss_ce +  LS_loss.mean()
         # print('Loss: ', total_loss)
-        total_loss = total_loss.contiguous().view(-1)
-        loss_ce = total_loss.mean()
 
+        total_pixel_loss = total_pixel_loss.contiguous().view(-1)
+        ce_loss = total_pixel_loss.mean()
+
+        ls_loss = LS(output, semantic_label)
+
+        total_loss = ls_loss+ce_loss
         optimizer.zero_grad()
-        loss_ce.backward()
+        total_loss.backward()
         optimizer.step()
-        print(loss_ce)
+        print(total_loss)
         # scaler.step(optimizer)
         # scaler.update()
         # break
 
-    if current_epoch % validation_step == 0:
-        precision, miou = val(BiSeNet_MOS, val_loader)
-        print('precision: ', str(precision), 'miou', miou)
-        if miou > max_miou:
-            max_miou = miou
-            torch.save(BiSeNet_MOS,
-                       'save/BiSeNet_model_state_dict')
+    # if current_epoch % validation_step == 0:
+    #     precision, miou = val(BiSeNet_MOS, val_loader)
+    #     print('precision: ', str(precision), 'miou', miou)
+    #     if miou > max_miou:
+    #         max_miou = miou
+    #         torch.save(BiSeNet_MOS,
+    #                    'save/BiSeNet_model_state_dict')
 
-
+    torch.save(BiSeNet_MOS.state_dict(), 'save/ResLSTM_model_state_dict')
 
