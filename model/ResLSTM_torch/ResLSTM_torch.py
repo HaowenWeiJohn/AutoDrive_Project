@@ -1,10 +1,7 @@
 # import __init__ as booger
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from SalsaNext import *
-from ConvLSTM_pytorch import *
-from TimeDis import *
+from model.SalsaNext.SalsaNext import *
+from model.ResLSTM_torch.ConvLSTM_pytorch import *
+from model.ResLSTM_torch.TimeDis import *
 
 class ResLSTM(nn.Module):
 
