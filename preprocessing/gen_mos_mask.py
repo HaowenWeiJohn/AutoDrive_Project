@@ -73,6 +73,7 @@ for sequence in sequences:
                             fov_up=range_image_params['fov_up'],
                             fov_down=range_image_params['fov_down'])
     # index_range = list(range(0,len(scan_paths)))
+    print('Generate mask for sequence:', sequence, 'Frames: ', str(len(scan_paths)))
     for frame_idx in tqdm(range(len(scan_paths))):
         mask_file_name = os.path.join(mask_image_folder, str(frame_idx).zfill(6))
         sem_scan.open_scan(scan_paths[frame_idx])
