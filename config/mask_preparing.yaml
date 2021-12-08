@@ -10,20 +10,27 @@ debug: False
 
 # Inputs
 # the folder of raw LiDAR scans
-scan_folder: '../data/sequences/08/velodyne'
-# the folder of labels
-label_folder: '../data/sequences/08/labels'
 
+data_folder: '/media/server-ak209/ROS/hwei/data/dataset/sequences'
+sequences: ['00', '01']
+
+
+scan_folder: 'velodyne'
 # ground truth poses file
-pose_file: '../data/sequences/08/poses.txt'
+pose_file: 'poses.txt'
 # calibration file
-calib_file: '../data/sequences/08/calib.txt'
+calib_file: 'calib.txt'
+# label folder
+label_folder: 'labels'
 
 # Outputs
 # the onehot encoded mask: 0,1,2
-mask_image_folder: '../data/sequences/08/mask_image'
+
+mask_image_folder: 'mask_image'
 visualize: True
-visualization_folder: '../data/sequences/08/mask_visualization'
+visualization_folder: 'mask_visualization'
+
+
 
 # range image parameters
 range_image:

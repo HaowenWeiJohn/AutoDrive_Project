@@ -29,64 +29,75 @@ label_transfer_dict = CFG["learning_map"]
 nclasses = len(color_dict)
 
 # mask config
+data_folder = config['data_folder']
 debug = config['debug']
 visualize = config['visualize']
-visualization_folder = config['visualization_folder']
-scan_folder = config['scan_folder']
-label_folder = config['label_folder']
-mask_image_folder = config['mask_image_folder']
 range_image_params = config['range_image']
-
+sequences = config['sequences']
 # create mask folder
-if not os.path.exists(mask_image_folder):
-    os.makedirs(mask_image_folder)
+for sequence in sequences:
 
-# create mask image visualization folder
-if visualize:
-    if not os.path.exists(visualization_folder):
-        os.makedirs(visualization_folder)
+    sequence_folder = os.path.join(data_folder, sequence)
 
+    visualization_folder = config['visualization_folder']
+    scan_folder = config['scan_folder']
+    label_folder = config['label_folder']
+    mask_image_folder = config['mask_image_folder']
 
-# load labels
-scan_paths = load_files(scan_folder)
-label_paths = load_files(label_folder)
-
-# create scan object
-sem_scan = SemLaserScan(nclasses=nclasses,
-                        sem_color_dict=color_dict,
-                        project=True,
-                        flip_sign=False,
-                        H=range_image_params['height'],
-                        W=range_image_params['width'],
-                        fov_up=range_image_params['fov_up'],
-                        fov_down=range_image_params['fov_down'])
+    visualization_folder = os.path.join(sequence_folder, visualization_folder)
+    scan_folder = os.path.join(sequence_folder, scan_folder)
+    label_folder = os.path.join(sequence_folder, label_folder)
+    mask_image_folder = os.path.join(sequence_folder, mask_image_folder)
 
 
-for frame_idx in tqdm(range(len(scan_paths))):
-    mask_file_name = os.path.join(mask_image_folder, str(frame_idx).zfill(6))
-    sem_scan.open_scan(scan_paths[frame_idx])
-    sem_scan.open_label(label_paths[frame_idx])
+    if not os.path.exists(mask_image_folder):
+        os.makedirs(mask_image_folder)
 
-    original_label = np.copy(sem_scan.proj_sem_label)
-    label_new = sem_label_transform(original_label, label_transfer_dict=label_transfer_dict)
-
+    # create mask image visualization folder
     if visualize:
-        fig = plt.figure(frameon=False, figsize=(16, 10))
-        fig.set_size_inches(20.48, 0.64)
-        ax = plt.Axes(fig, [0., 0., 1., 1.])
-        ax.set_axis_off()
-        fig.add_axes(ax)
-        img = label_new.copy()
-        img[img<2]=0
-        ax.imshow(img, vmin=0, vmax=1)
-        image_name = os.path.join(visualization_folder, str(frame_idx).zfill(6))
-        plt.savefig(image_name)
-        plt.close()
+        if not os.path.exists(visualization_folder):
+            os.makedirs(visualization_folder)
 
-    # save to npy file
-    label_new_one_hot = depth_onehot(matrix=label_new, category=[0, 1, 2], on_value=1, off_value=0, channel_first=True)
 
-    np.save(mask_file_name, [label_new, label_new_one_hot])
+    # load labels
+    scan_paths = load_files(scan_folder)
+    label_paths = load_files(label_folder)
+
+    # create scan object
+    sem_scan = SemLaserScan(nclasses=nclasses,
+                            sem_color_dict=color_dict,
+                            project=True,
+                            flip_sign=False,
+                            H=range_image_params['height'],
+                            W=range_image_params['width'],
+                            fov_up=range_image_params['fov_up'],
+                            fov_down=range_image_params['fov_down'])
+    # index_range = list(range(0,len(scan_paths)))
+    for frame_idx in tqdm(range(len(scan_paths))):
+        mask_file_name = os.path.join(mask_image_folder, str(frame_idx).zfill(6))
+        sem_scan.open_scan(scan_paths[frame_idx])
+        sem_scan.open_label(label_paths[frame_idx])
+
+        original_label = np.copy(sem_scan.proj_sem_label)
+        label_new = sem_label_transform(original_label, label_transfer_dict=label_transfer_dict)
+
+        if visualize:
+            fig = plt.figure(frameon=False, figsize=(16, 10))
+            fig.set_size_inches(20.48, 0.64)
+            ax = plt.Axes(fig, [0., 0., 1., 1.])
+            ax.set_axis_off()
+            fig.add_axes(ax)
+            img = label_new.copy()
+            img[img<2]=0
+            ax.imshow(img, vmin=0, vmax=1)
+            image_name = os.path.join(visualization_folder, str(frame_idx).zfill(6))
+            plt.savefig(image_name)
+            plt.close()
+
+        # save to npy file
+        label_new_one_hot = depth_onehot(matrix=label_new, category=[0, 1, 2], on_value=1, off_value=0, channel_first=True)
+
+        np.save(mask_file_name, [label_new, label_new_one_hot, sem_scan.proj_idx])
 
 
 
