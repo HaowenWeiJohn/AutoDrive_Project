@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     val_loader = DataLoader(dataset=val_dataset, batch_size=1, shuffle=False)
 
-    predictor = Torch_Predictor(model=ResLSTM(nclasses=3), model_path='../../model/ResLSTM_torch/save/ResLSTM_model_state_dict', data_loader=val_loader,
+    predictor = Torch_Predictor(model=ResLSTM(nclasses=3), model_path='../../model/ResLSTM_torch/save/test1/ResLSTM_model_state_dict', data_loader=val_loader,
                                 save_dir='../../data/sequences/08/pred',
                                 num_class=3, use_gpu=True)
 

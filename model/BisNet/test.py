@@ -41,7 +41,7 @@ WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(de
 # NLL = nn.NLLLoss(weight=weight).to(device)
 LS = Lovasz_softmax(ignore=0).to(device)
 
-optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-6,weight_decay=1e-9)
+optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-5,weight_decay=1e-9)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
 
 # scaler = torch.cuda.amp.GradScaler()
@@ -55,7 +55,7 @@ train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 train_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 val_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 
-train_loader = DataLoader(dataset=train_dataset, batch_size=4, shuffle=True)
+train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
 val_loader = DataLoader(dataset=val_dataset, batch_size=1, shuffle=True)
 #################
 

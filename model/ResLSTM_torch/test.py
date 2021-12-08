@@ -97,7 +97,7 @@ for current_epoch in range(0, 100):
         # batch_iteration.set_description('loss: '+ str(total_loss))
         # batch_loss.append(total_loss.item())
         print('Epoch: %s,  Batch Index: %s, Total Loss: %s' % (str(current_epoch), str(batch_index), str(total_loss) ))
-    torch.save(ResLSTM_model.state_dict(), 'save/ResLSTM_model_state_dict')
+    torch.save(ResLSTM_model.state_dict(), 'save/test1/ResLSTM_model_state_dict')
     epoch_loss.append(np.average(batch_loss))
     np.save('loss_his', np.array(epoch_loss))
     print(epoch_loss)
