@@ -31,16 +31,17 @@ device = torch.device('cuda:0')
 
 BiSeNet_MOS = BiSeNet(3, 'resnet18')
 BiSeNet_MOS.to(device)
+
 print(torch.cuda.memory_summary())
 
 
 weight=torch.tensor(weight).to(device)
 
-WCE = nn.CrossEntropyLoss(weight=weight, reduction='none').to(device)
+WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(device)
 # NLL = nn.NLLLoss(weight=weight).to(device)
 LS = Lovasz_softmax(ignore=0).to(device)
 
-optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-4,weight_decay=1e-7)
+optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-6,weight_decay=1e-9)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
 
 # scaler = torch.cuda.amp.GradScaler()
@@ -70,6 +71,7 @@ for current_epoch in range(0, 100):
 
     print('Epoch: ', current_epoch)
     print(optimizer.param_groups[0]['lr'])
+    BiSeNet_MOS.train()
 
     for batch_index, (semantic_input, semantic_label) in enumerate(train_loader):
         semantic_input = semantic_input.to(device)
@@ -101,13 +103,17 @@ for current_epoch in range(0, 100):
         total_pixel_loss = total_pixel_loss.contiguous().view(-1)
         ce_loss = total_pixel_loss.mean()
 
-        ls_loss = LS(output, semantic_label)
+        # ls_loss = LS(F.softmax(output, dim=1), semantic_label)
 
-        total_loss = ls_loss+ce_loss
+        total_loss = ce_loss
         optimizer.zero_grad()
         total_loss.backward()
+
+        # torch.nn.utils.clip_grad_norm(BiSeNet_MOS.parameters(), max_norm=1)
+
         optimizer.step()
         print(total_loss)
+        print(batch_index)
         # scaler.step(optimizer)
         # scaler.update()
         # break

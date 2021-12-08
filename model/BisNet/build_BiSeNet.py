@@ -118,9 +118,9 @@ class BiSeNet(torch.nn.Module):
 
         # build final convolution
         self.conv = nn.Conv2d(in_channels=num_classes, out_channels=num_classes, kernel_size=1)
-        self.softmax1 = torch.nn.Softmax(dim=1)
-        self.softmax2 = torch.nn.Softmax(dim=1)
-        self.softmax3 = torch.nn.Softmax(dim=1)
+        # self.softmax1 = torch.nn.Softmax(dim=1)
+        # self.softmax2 = torch.nn.Softmax(dim=1)
+        # self.softmax3 = torch.nn.Softmax(dim=1)
 
 
         self.init_weight()
@@ -171,11 +171,11 @@ class BiSeNet(torch.nn.Module):
         # upsampling
         result = torch.nn.functional.interpolate(result, scale_factor=8, mode='bilinear')
         result = self.conv(result)
-        result = self.softmax1(result)
+        # result = self.softmax1(result)
 
         if self.training == True:
-            cx1_sup = self.softmax1(cx1_sup)
-            cx2_sup = self.softmax1(cx2_sup)
+            # cx1_sup = self.softmax1(cx1_sup)
+            # cx2_sup = self.softmax1(cx2_sup)
             return result, cx1_sup, cx2_sup
 
         return result
