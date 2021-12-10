@@ -16,7 +16,7 @@ from model.ResLSTM_torch.ResLSTM_torch import ResLSTM
 from model.prediction_utils.utils import val, reverse_one_hot
 
 class Training_Logger:
-    def __init__(self, root_dir, logger_dir, model_name='best_model', over_write=True):
+    def __init__(self, root_dir, logger_dir='training_logger', model_name='best_model', over_write=True):
         self.root_dir = root_dir
         self.history_csv='history.csv'
         self.model=None
@@ -24,6 +24,7 @@ class Training_Logger:
         self.logger_dir=logger_dir
         self.over_write=over_write
         self.init_logger()
+        self.model_name = model_name
 
     def init_logger(self):
         if os.path.isdir(self.root_dir):
@@ -48,12 +49,12 @@ class Training_Logger:
 
         with open(self.history_csv, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(['epoch', 'train_loss', 'val_loss', 'val_miou'])
+            writer.writerow(['epoch', 'train_loss', 'val_loss', 'val_precision', 'val_miou'])
             f.close()
 
     def save_model(self, model=None):
         if model:
-            torch.save(model.state_dict(), os.path.join(self.logger_dir))
+            torch.save(model.state_dict(), os.path.join(self.logger_dir, self.model_name))
 
     def log_hist(self, epoch, train_loss, val_loss=None, val_miou=None):
 

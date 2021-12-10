@@ -73,6 +73,7 @@ class BiSeNet_DataLoader(Dataset):
         return len(self.data_files)
 
     def __getitem__(self, index):
+        # print(index)
         # x = np.array([1,2,3]) # read index
         # y = np.array([1,2,3]) # read index
         # y_mask = np.array([1,2,3])
