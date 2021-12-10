@@ -16,7 +16,7 @@ from tqdm import tqdm
 from model.prediction_utils.utils import val
 
 from model.CustomDataLoader.dataloader import ResLSTM_DataLoader, BiSeNet_DataLoader
-from config.training_config import root_data_dir
+from config.training_config import root_data_dir, root_save_dir
 
 from build_BiSeNet import BiSeNet
 from model.ResLSTM_torch.Lovasz_Softmax import Lovasz_softmax
@@ -44,19 +44,22 @@ WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(de
 LS = Lovasz_softmax(ignore=0).to(device)
 
 optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-5,weight_decay=1e-9)
-# scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.95)
 
 #################
 # data loader
-train_data_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'x')
-train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
+train_data_dir = os.path.join(root_data_dir, 'train_test_val', 'train', 'x')
+train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'train', 'y')
+val_data_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'x')
+val_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
+
 train_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
-val_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
-train_loader = DataLoader(dataset=train_dataset, batch_size=4, shuffle=True)
+val_dataset = BiSeNet_DataLoader(data_dir=val_data_dir, label_dir=val_label_dir)
+train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
 val_loader = DataLoader(dataset=val_dataset, batch_size=16, shuffle=False)
 #################
 # training logger
-training_logger = Training_Logger(root_dir='C:/Users/Haowe/PycharmProjects/AutoDrive_Project/training_save', logger_dir='BiSeNet_1')
+training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_1')
 
 #################
 
@@ -74,7 +77,7 @@ training_logger = Training_Logger(root_dir='C:/Users/Haowe/PycharmProjects/AutoD
 val_iou_eval = iouEval(n_classes=3, ignore=0)
 
 
-for current_epoch in range(0, 100):
+for current_epoch in range(0, 60):
 
     print('Epoch: ', current_epoch)
     print('learning rate: ', optimizer.param_groups[0]['lr'])
@@ -112,6 +115,8 @@ for current_epoch in range(0, 100):
         looper.refresh()
         # break
 
+
+    scheduler.step()
     train_ave_epoch_loss = np.average(epoch_loss)
     print('train_ave_epoch_loss: ', str(train_ave_epoch_loss))
 
@@ -132,6 +137,6 @@ for current_epoch in range(0, 100):
     training_logger.log_hist(epoch=history_content[0],
                              train_loss=history_content[1],
                              val_miou=history_content[2],
-                             val_acc = history_content[3])
+                             val_acc=history_content[3])
 
 

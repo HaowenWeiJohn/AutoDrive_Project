@@ -73,6 +73,7 @@ class BiSeNet_DataLoader(Dataset):
         return len(self.data_files)
 
     def __getitem__(self, index):
+        # current_time = time.time()
         # print(index)
         # x = np.array([1,2,3]) # read index
         # y = np.array([1,2,3]) # read index
@@ -82,6 +83,7 @@ class BiSeNet_DataLoader(Dataset):
         y = np.load(self.label_files[index], allow_pickle=True)
         y_label = y[0]
         y_onehot = y[1]
+        # print(time.time()-current_time)
         # # y_mask = torch.from_numpy(y_mask)
 
         return torch.from_numpy(x), torch.from_numpy(y_label).to(dtype=torch.long)
