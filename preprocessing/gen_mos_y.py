@@ -21,11 +21,13 @@ except:
 sequence_folder = '/media/server-ak209/ROS/hwei/data/dataset/sequences'
 data_folder = '/media/server-ak209/ROS/hwei/data/train_test_val'
 
-folder_name = 'train'
+folder_name = 'val'
 
 # the data structure will be range image + res_image_1_2_3_4_5_6_7
 
-sequences = ['00', '01', '02', '03', '04', '05', '06', '07', '09', '10']
+sequences = [ '08'
+    # '00', '01', '02', '03', '04', '05', '06', '07', '09', '10'
+]
 
 
 
