@@ -2,6 +2,7 @@
 import os.path
 import sys
 
+from utils.auxiliary.np_ioueval import iouEval
 from utils.training_logger.training_logger import Training_Logger
 
 sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
@@ -52,10 +53,10 @@ train_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 train_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 val_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 train_loader = DataLoader(dataset=train_dataset, batch_size=4, shuffle=True)
-val_loader = DataLoader(dataset=val_dataset, batch_size=1, shuffle=False)
+val_loader = DataLoader(dataset=val_dataset, batch_size=16, shuffle=False)
 #################
 # training logger
-training_logger = Training_Logger(root_dir='C:/Users/Haowe/PycharmProjects/AutoDrive_Project/training_save')
+training_logger = Training_Logger(root_dir='C:/Users/Haowe/PycharmProjects/AutoDrive_Project/training_save', logger_dir='BiSeNet_1')
 
 #################
 
@@ -69,6 +70,8 @@ training_logger = Training_Logger(root_dir='C:/Users/Haowe/PycharmProjects/AutoD
 # semantic_label_mask = torch.ones(N, 1, 16, 16).to(dtype=torch.long)
 
 
+# train_iou_eval = iouEval(n_classes=3, ignore=0)
+val_iou_eval = iouEval(n_classes=3, ignore=0)
 
 
 for current_epoch in range(0, 100):
@@ -86,6 +89,7 @@ for current_epoch in range(0, 100):
         semantic_label = semantic_label.to(device)
 
         output, output_sup1, output_sup2 = BiSeNet_MOS(semantic_input)
+        # a = output.detach().numpy()
 
         pixel_loss1 = WCE(output, semantic_label).to(device)
         pixel_loss2 = WCE(output_sup1, semantic_label).to(device)
@@ -106,7 +110,7 @@ for current_epoch in range(0, 100):
 
         looper.set_description("Total_loss = %s" % str(total_loss.item()))
         looper.refresh()
-
+        # break
 
     train_ave_epoch_loss = np.average(epoch_loss)
     print('train_ave_epoch_loss: ', str(train_ave_epoch_loss))
@@ -116,18 +120,18 @@ for current_epoch in range(0, 100):
 
 
     if current_epoch % validation_step == 0:  # make one val after the first epoch
-        val_precision, val_miou = val(model=BiSeNet_MOS, dataloader=val_loader)
-        history_content[2] = val_precision
-        history_content[3] = val_miou
+        iou_mean, iou, acc = val(model=BiSeNet_MOS, dataloader=val_loader)
+        history_content[2] = iou_mean
+        history_content[3] = acc
 
-        print('validation precision: ', str(val_precision), 'validation miou', val_miou)
-        if val_miou > max_miou:
-            max_miou = val_miou
+        print('validation iou mean: ', str(iou_mean), 'validation acc: ', str(acc))
+        if iou_mean > max_miou:
+            max_miou = iou_mean
             training_logger.save_model(model=BiSeNet_MOS)
 
     training_logger.log_hist(epoch=history_content[0],
                              train_loss=history_content[1],
-                             val_loss=history_content[2],
-                             val_miou=history_content[3])
+                             val_miou=history_content[2],
+                             val_acc = history_content[3])
 
 

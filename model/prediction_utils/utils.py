@@ -7,6 +7,10 @@ import pandas as pd
 import random
 import numbers
 import torchvision
+from tqdm import tqdm
+
+from utils.auxiliary.np_ioueval import iouEval
+
 
 def poly_lr_scheduler(optimizer, init_lr, iter, lr_decay_iter=1,
                       max_iter=300, power=0.9):
@@ -21,10 +25,11 @@ def poly_lr_scheduler(optimizer, init_lr, iter, lr_decay_iter=1,
     # if iter % lr_decay_iter or iter > max_iter:
     # 	return optimizer
 
-    lr = init_lr*(1 - iter/max_iter)**power
+    lr = init_lr * (1 - iter / max_iter) ** power
     optimizer.param_groups[0]['lr'] = lr
     return lr
     # return lr
+
 
 def get_label_info(csv_path):
     # return label -> {label_name: [r_value, g_value, b_value, ...}
@@ -38,6 +43,7 @@ def get_label_info(csv_path):
         class_11 = row['class_11']
         label[label_name] = [int(r), int(g), int(b), class_11]
     return label
+
 
 def one_hot_it(label, label_info):
     # return semantic_map -> [H, W]
@@ -74,6 +80,7 @@ def one_hot_it_v11(label, label_info):
             semantic_map[class_map] = 11
     return semantic_map
 
+
 def one_hot_it_v11_dice(label, label_info):
     # return semantic_map -> [H, W, class_num]
     semantic_map = []
@@ -94,6 +101,7 @@ def one_hot_it_v11_dice(label, label_info):
     semantic_map.append(void)
     semantic_map = np.stack(semantic_map, axis=-1).astype(np.float)
     return semantic_map
+
 
 def reverse_one_hot(image):
     """
@@ -148,6 +156,7 @@ def colour_code_segmentation(image, label_values):
 
     return x
 
+
 def compute_global_accuracy(pred, label):
     pred = pred.flatten()
     label = label.flatten()
@@ -157,6 +166,7 @@ def compute_global_accuracy(pred, label):
         if pred[i] == label[i]:
             count = count + 1.0
     return float(count) / float(total)
+
 
 def fast_hist(a, b, n):
     '''
@@ -170,6 +180,7 @@ def fast_hist(a, b, n):
 def per_class_iu(hist):
     epsilon = 1e-5
     return (np.diag(hist) + epsilon) / (hist.sum(1) + hist.sum(0) - np.diag(hist) + epsilon)
+
 
 class RandomCrop(object):
     """Crop the given PIL Image at a random location.
@@ -240,6 +251,7 @@ class RandomCrop(object):
     def __repr__(self):
         return self.__class__.__name__ + '(size={0}, padding={1})'.format(self.size, self.padding)
 
+
 def cal_miou(miou_list, csv_path):
     # return label -> {label_name: [r_value, g_value, b_value, ...}
     ann = pd.read_csv(csv_path)
@@ -253,6 +265,7 @@ def cal_miou(miou_list, csv_path):
             cnt += 1
     return miou_dict, np.mean(miou_list)
 
+
 class OHEM_CrossEntroy_Loss(nn.Module):
     def __init__(self, threshold, keep_num):
         super(OHEM_CrossEntroy_Loss, self).__init__()
@@ -265,10 +278,11 @@ class OHEM_CrossEntroy_Loss(nn.Module):
         loss, loss_index = torch.sort(loss, descending=True)
         threshold_in_keep_num = loss[self.keep_num]
         if threshold_in_keep_num > self.threshold:
-            loss = loss[loss>self.threshold]
+            loss = loss[loss > self.threshold]
         else:
             loss = loss[:self.keep_num]
         return torch.mean(loss)
+
 
 def group_weight(weight_group, module, norm_layer, lr):
     group_decay = []
@@ -295,48 +309,24 @@ def group_weight(weight_group, module, norm_layer, lr):
     return weight_group
 
 
-def val(model, dataloader, num_classes=3, use_gpu=True):
+def val(model, dataloader, iou_eval=iouEval(n_classes=3, ignore=0), num_classes=3, use_gpu=True):
     print('start val!')
+
     # label_info = get_label_info(csv_path)
     with torch.no_grad():
+        iou_eval.reset()
         model.eval()
-        precision_record = []
-        hist = np.zeros((num_classes, num_classes))
-        for i, (data, label) in enumerate(dataloader):
+
+        for (data, label) in tqdm(dataloader):
             if torch.cuda.is_available() and use_gpu:
                 data = data.cuda()
                 label = label.cuda()
 
             # get RGB predict image
-            predict = model(data).squeeze()
-            predict = reverse_one_hot(predict)
-            predict = np.array(predict.cpu().numpy())
+            predict = model(data)
+            predict = torch.argmax(predict, dim=1)
+            iou_eval.addBatch(x=predict.cpu().numpy(), y=label.cpu().numpy())
 
-            # get RGB label image
-            label = label.squeeze()
-            # if args.loss == 'dice':
-            #     label = reverse_one_hot(label)
-            label = np.array(label.cpu().numpy())
-
-            # compute per pixel accuracy
-
-            precision = compute_global_accuracy(predict, label)
-            hist += fast_hist(label.flatten(), predict.flatten(), num_classes)
-
-            # there is no need to transform the one-hot array to visual RGB array
-            # predict = colour_code_segmentation(np.array(predict), label_info)
-            # label = colour_code_segmentation(np.array(label), label_info)
-            precision_record.append(precision)
-        precision = np.mean(precision_record)
-        # miou = np.mean(per_class_iu(hist))
-        miou_list = per_class_iu(hist)[:-1]
-        # miou_dict, miou = cal_miou(miou_list, csv_path)
-        miou = np.mean(miou_list)
-        print('precision per pixel for test: %.3f' % precision)
-        print('mIoU for validation: %.3f' % miou)
-        # miou_str = ''
-        # for key in miou_dict:
-        #     miou_str += '{}:{},\n'.format(key, miou_dict[key])
-        # print('mIoU for each class:')
-        # print(miou_str)
-        return precision, miou
+    iou_mean, iou = iou_eval.getIoU()
+    acc = iou_eval.getacc()
+    return iou_mean, iou, acc
