@@ -51,7 +51,7 @@ class Training_Logger:
 
         with open(self.history_csv, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(['epoch', 'train_loss', 'val_loss', 'val_miou'])
+            writer.writerow(['epoch', 'train_loss', 'val_miou', 'val_acc'])
             f.close()
 
     def save_model(self, model=None):

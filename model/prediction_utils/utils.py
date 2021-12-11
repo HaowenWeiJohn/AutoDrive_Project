@@ -309,7 +309,7 @@ def group_weight(weight_group, module, norm_layer, lr):
     return weight_group
 
 
-def val(model, dataloader, iou_eval=iouEval(n_classes=3, ignore=0), num_classes=3, use_gpu=True):
+def val(model, dataloader, iou_eval=iouEval(n_classes=3, ignore=0), use_gpu=True):
     print('start val!')
 
     # label_info = get_label_info(csv_path)

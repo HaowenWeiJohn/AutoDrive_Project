@@ -23,7 +23,7 @@ from model.ResLSTM_torch.Lovasz_Softmax import Lovasz_softmax
 
 nclasses = 3
 weight = [0.0, 9.0, 251.0]
-validation_step = 3
+validation_step = 1
 max_miou = 0
 
 print(torch.cuda.is_available())
@@ -59,7 +59,7 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
 val_loader = DataLoader(dataset=val_dataset, batch_size=16, shuffle=False)
 #################
 # training logger
-training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_1')
+training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_without_lovasz')
 
 #################
 
