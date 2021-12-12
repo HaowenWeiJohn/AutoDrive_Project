@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from build_contextpath import build_contextpath
+from model.BisNet.build_contextpath import build_contextpath
 from torch.nn.functional import interpolate
 import warnings
 
