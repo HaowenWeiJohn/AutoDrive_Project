@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from model.CustomDataLoader.dataloader import ResLSTM_DataLoader
-from config.training_config import root_data_dir
+from config.data_path_config import root_data_dir
 
 
 from model.ResLSTM_torch.Lovasz_Softmax import Lovasz_softmax

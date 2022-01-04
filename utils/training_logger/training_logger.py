@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from config.training_config import root_data_dir
+from config.data_path_config import root_data_dir
 from model.CustomDataLoader.dataloader import BiSeNet_DataLoader, ResLSTM_DataLoader
 from model.ResLSTM_torch.ResLSTM_torch import ResLSTM
 from model.prediction_utils.utils import val, reverse_one_hot

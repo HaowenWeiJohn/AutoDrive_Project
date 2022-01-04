@@ -16,7 +16,7 @@ from tqdm import tqdm
 from model.prediction_utils.utils import val
 
 from model.CustomDataLoader.dataloader import ResLSTM_DataLoader, BiSeNet_DataLoader
-from config.training_config import root_data_dir, root_save_dir
+from config.data_path_config import root_data_dir, root_save_dir
 
 from build_BiSeNet import BiSeNet
 from model.ResLSTM_torch.Lovasz_Softmax import Lovasz_softmax
