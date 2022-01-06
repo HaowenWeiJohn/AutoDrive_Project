@@ -10,8 +10,9 @@ if os_type == "Windows":
     root_data_dir = 'C:/Users/Haowe/PycharmProjects/AutoDrive_Project/data'
     root_save_dir = 'C:/Users/Haowe/PycharmProjects/AutoDrive_Project/training_save'
 else:
-    root_data_dir = '/media/server-ak209/ROS/hwei/data'
-    root_save_dir = '/media/server-ak209/ROS/hwei/AutoDrive_Project/training_save'
+    # root_data_dir = '/home/ak209/Desktop/hwei/AutoDrive/data'
+    root_data_dir = '/home/ak209/Desktop/hwei/AutoDrive/data'
+    root_save_dir = '/home/ak209/Desktop/hwei/PycharmProjects/AutoDrive_Project/training_save'
 
 
 

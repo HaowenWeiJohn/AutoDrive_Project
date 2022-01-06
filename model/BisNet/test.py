@@ -44,7 +44,7 @@ WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(de
 LS = Lovasz_softmax(ignore=0).to(device)
 
 optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-5,weight_decay=1e-9)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.95)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.97)
 
 #################
 # data loader
@@ -55,11 +55,11 @@ val_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 
 train_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 val_dataset = BiSeNet_DataLoader(data_dir=val_data_dir, label_dir=val_label_dir)
-train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
-val_loader = DataLoader(dataset=val_dataset, batch_size=16, shuffle=False)
+train_loader = DataLoader(dataset=train_dataset, batch_size=24, shuffle=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=24, shuffle=False)
 #################
 # training logger
-training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_without_lovasz')
+training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_without_lovasz_new_machine')
 
 #################
 

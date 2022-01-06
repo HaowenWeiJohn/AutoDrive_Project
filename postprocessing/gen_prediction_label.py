@@ -27,9 +27,10 @@ analysis_sequence=['11','12','13','14','15','16','17','18','19','20','21']
 
 for sequence in analysis_sequence:
 
-    sequence_dir = os.path.join(root_data_dir, 'sequence')
+    sequence_dir = os.path.join(root_data_dir, 'dataset', 'sequences')
 
-    for rot
+    # create label folder in target test folder
+    # for rot
 
     # for sequence in this sequence we can get more information
 
