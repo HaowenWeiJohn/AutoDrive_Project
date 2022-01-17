@@ -168,11 +168,11 @@ class UpBlock(nn.Module):
 
 
 class SalsaNext(nn.Module):
-    def __init__(self, nclasses):
+    def __init__(self, nclasses, input_channel_num=32):
         super(SalsaNext, self).__init__()
         self.nclasses = nclasses
 
-        self.downCntx = ResContextBlock(32, 32)
+        self.downCntx = ResContextBlock(input_channel_num, 32)
         self.downCntx2 = ResContextBlock(32, 32)
         self.downCntx3 = ResContextBlock(32, 32)
 
@@ -205,7 +205,7 @@ class SalsaNext(nn.Module):
         up2e = self.upBlock3(up3e, down1b)
         up1e = self.upBlock4(up2e, down0b)
         logits = self.logits(up1e)
-
-        # logits = logits
-        logits = F.softmax(logits, dim=1)
+        #
+        # # logits = logits
+        # logits = F.softmax(logits, dim=1)
         return logits

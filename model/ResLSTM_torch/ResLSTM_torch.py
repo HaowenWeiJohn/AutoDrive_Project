@@ -10,10 +10,10 @@ class ResLSTM(nn.Module):
 
         self.tdconv1 = TimeDistributed(ResContextBlock(9, 32), time_steps=5)
         self.tdconv2 = TimeDistributed(ResContextBlock(32,32), time_steps=5)
-        # self.tdconv3 = TimeDistributed(ResContextBlock(32,32))
+        self.tdconv3 = TimeDistributed(ResContextBlock(32,32), time_steps=5)
 
         self.convlstm1 = ConvLSTM(input_dim=32, hidden_dim=32,
-                            kernel_size=(3,3), num_layers=1,
+                            kernel_size=(3,3), num_layers=2,
                             batch_first=True, bias=True,
                             return_all_layers=False)
 
