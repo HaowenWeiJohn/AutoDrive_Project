@@ -21,7 +21,8 @@ class ResLSTM_DataLoader(Dataset):
         self.transform = transform
 
         self.data_files = load_files(data_dir)
-        self.label_files = load_files(label_dir)
+        if label_dir:
+            self.label_files = load_files(label_dir)
 
     def __len__(self):
         return len(self.data_files)
@@ -30,18 +31,20 @@ class ResLSTM_DataLoader(Dataset):
         # x = np.array([1,2,3]) # read index
         # y = np.array([1,2,3]) # read index
         # y_mask = np.array([1,2,3])
-
         x = np.load(self.data_files[index])
-        y = np.load(self.label_files[index], allow_pickle=True)
-        # current = time.time()
-
         x = self.input_preprocessing(x)
-        y_label = y[0]
-        y_onehot = y[1]
-        # y_mask = torch.from_numpy(y_mask)
-        # print('use: ', str(time.time()-current))
 
-        return torch.from_numpy(x), torch.from_numpy(y_label).to(dtype=torch.long)
+        if self.label_dir:
+            y = np.load(self.label_files[index], allow_pickle=True)
+            # current = time.time()
+            y_label = y[0]
+            y_onehot = y[1]
+            # y_mask = torch.from_numpy(y_mask)
+            # print('use: ', str(time.time()-current))
+            return torch.from_numpy(x), torch.from_numpy(y_label).to(dtype=torch.long)
+
+        else:
+            return torch.from_numpy(x)
 
         # if self.transform
 
