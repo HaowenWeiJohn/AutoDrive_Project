@@ -15,7 +15,7 @@ from utils.utils import load_files
 
 
 class ResLSTM_DataLoader(Dataset):
-    def __init__(self, data_dir, label_dir, transform=None):
+    def __init__(self, data_dir, label_dir, transform=None, return_file_name=False):
         self.data_dir = data_dir
         self.label_dir = label_dir
         self.transform = transform
@@ -44,7 +44,7 @@ class ResLSTM_DataLoader(Dataset):
             return torch.from_numpy(x), torch.from_numpy(y_label).to(dtype=torch.long)
 
         else:
-            return torch.from_numpy(x)
+            return torch.from_numpy(x), os.path.basename(os.path.splitext(self.data_files[index])[0])
 
         # if self.transform
 

@@ -109,7 +109,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+PC_cluster/
 # Spyder project settings
 .spyderproject
 .spyproject

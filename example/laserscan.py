@@ -39,6 +39,8 @@ class LaserScan:
     # [H,W] index (-1 is no data)
     self.proj_idx = np.full((self.proj_H, self.proj_W), -1,
                             dtype=np.int32)
+    self.proj_idx_gt = np.full((self.proj_H, self.proj_W), -1,
+                            dtype=np.int32)
 
     # for each point, where it is in the range image
     self.proj_x = np.zeros((0, 1), dtype=np.float32)        # [m, 1]: x
@@ -79,7 +81,7 @@ class LaserScan:
     remissions = scan[:, 3]  # get remission
     self.set_points(points, remissions)
 
-  def set_points(self, points, remissions=None):
+  def set_points(self, points, remissions=None, gt_idx=None):
     """ Set scan attributes (instead of opening from file)
     """
     # reset just in case there was an open structure
@@ -104,6 +106,11 @@ class LaserScan:
       self.remissions = remissions  # get remission
     else:
       self.remissions = np.zeros((points.shape[0]), dtype=np.float32)
+
+    if gt_idx is not None:
+      self.gt_idx = gt_idx  # get remission
+    else:
+      self.gt_idx = np.zeros((points.shape[0]), dtype=np.float32)
 
     # if projection is wanted, then do it and fill in the structure
     if self.project:
@@ -161,6 +168,7 @@ class LaserScan:
     indices = indices[order]
     points = self.points[order]
     remission = self.remissions[order]
+    gt_idx = self.gt_idx[order]
     proj_y = proj_y[order]
     proj_x = proj_x[order]
 
@@ -170,6 +178,7 @@ class LaserScan:
     self.proj_remission[proj_y, proj_x] = remission
     self.proj_idx[proj_y, proj_x] = indices
     self.proj_mask = (self.proj_idx > 0).astype(np.float32)
+    self.proj_idx_gt[proj_y, proj_x] = gt_idx
 
 
 class SemLaserScan(LaserScan):

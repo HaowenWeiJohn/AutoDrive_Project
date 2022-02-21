@@ -11,7 +11,7 @@ debug: False
 # Inputs
 # the folder of raw LiDAR scans
 
-data_folder: '/media/server-ak209/ROS/hwei/data/dataset/sequences'
+data_folder: '/home/ak209/Desktop/hwei/AutoDrive/data/dataset/sequences'
 sequences: ['06', '07', '08', '09', '10']
 
 

@@ -22,34 +22,37 @@ from config.post_processing_config import *
 # generate prediction result and KNN result
 
 # load model
-model_path = ''
-data_dir = ''
-save_prediction_dir = ''
+# model_path = ''
+# data_dir = ''
+# save_prediction_dir = ''
+#
+# # device = torch.device('cuda:0')
+# # model = ResLSTM(3).to(device=device)
+# # model.load_state_dict(torch.load(model_state_dict_path))
+# # model.eval()
+#
+#
+# # init knn
+# knn_params={'knn': 5, 'search': 5, 'sigma': 1.0, 'cutoff': 1.0}
+# post_knn = KNN(knn_params, 20)
+#
+# # get files in the test dir
+#
+#
+# dataset = ResLSTM_DataLoader(data_dir=data_dir, label_dir=None)
+#
+# dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
+#
+# predictor = Torch_Predictor(model=ResLSTM(nclasses=3),
+#                             model_path=model_path,
+#                             data_loader=dataloader,
+#                             save_dir=save_prediction_dir,
+#                             num_class=3, use_gpu=True)
+#
+# predictor.predict()
 
-# device = torch.device('cuda:0')
-# model = ResLSTM(3).to(device=device)
-# model.load_state_dict(torch.load(model_state_dict_path))
-# model.eval()
+# do the projection again and apply the KNN
 
-
-# init knn
-knn_params={'knn': 5, 'search': 5, 'sigma': 1.0, 'cutoff': 1.0}
-post_knn = KNN(knn_params, 20)
-
-# get files in the test dir
-
-
-dataset = ResLSTM_DataLoader(data_dir=data_dir, label_dir=None)
-
-dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
-
-predictor = Torch_Predictor(model=ResLSTM(nclasses=3),
-                            model_path=model_path,
-                            data_loader=dataloader,
-                            save_dir=save_prediction_dir,
-                            num_class=3, use_gpu=True)
-
-predictor.predict()
 
 
 
@@ -70,6 +73,23 @@ predictor.predict()
     # for sequence in this sequence we can get more information
 
 
+data_dir = '/home/ak209/Desktop/hwei/AutoDrive/data/train_test_val/test/x'
+model_path = '/home/ak209/Desktop/hwei/PycharmProjects/AutoDrive_Project/training_save/ResLSTM_new_machine/best_model'
+save_prediction_dir = '/home/ak209/Desktop/hwei/AutoDrive/data/train_test_val/test/y'
+visualize_dir = '/home/ak209/Desktop/hwei/AutoDrive/data/train_test_val/test/visualize'
+
+dataset = ResLSTM_DataLoader(data_dir=data_dir, label_dir=None)
+
+dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
+
+predictor = Torch_Predictor(model=ResLSTM(nclasses=3),
+                            model_path=model_path,
+                            data_loader=dataloader,
+                            save_dir=save_prediction_dir,
+                            visualize_dir=visualize_dir,
+                            num_class=3, use_gpu=True)
+
+predictor.test()
 
 
 
