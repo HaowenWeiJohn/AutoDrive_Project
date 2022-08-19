@@ -88,6 +88,13 @@ for sequence in sequences:
     # projection folder
     range_images_folder = os.path.join(sequence_folder,'gr_range_images_folder')# gr
 
+    current_frame_bird_view_visualization_folder = os.path.join(sequence_folder,'current_frame_bird_view_visualization')
+
+
+    if os.path.isdir(current_frame_bird_view_visualization_folder):
+        shutil.rmtree(current_frame_bird_view_visualization_folder)
+    os.mkdir(current_frame_bird_view_visualization_folder)
+
     if os.path.isdir(range_images_folder):
         shutil.rmtree(range_images_folder)
     os.mkdir(range_images_folder)
@@ -152,6 +159,8 @@ for sequence in sequences:
 
     # generate residual images for the whole sequence
     for frame_idx in tqdm(range(len(scan_paths))):
+        process = Processor(n_segments=70, n_bins=80, line_search_angle=0.3, max_dist_to_line=0.15,
+                            sensor_height=1.73, max_start_height=0.5, long_threshold=8)
         gr_clustering_dict = dict()
         current_pose = poses[frame_idx]
 
@@ -159,7 +168,11 @@ for sequence in sequences:
         points = sem_scan_current_frame.points
         points = points * np.array([1, 1, -1])
         points_non_ground = process(points)
+        current_bird_view = lidar_projection.birds_eye_point_cloud(points_non_ground,
+                                                                       side_range=(-50, 50), fwd_range=(-50, 50),
+                                                                       res=0.25, min_height=-2, max_height=4)
 
+        cv2.imwrite(os.path.join(current_frame_bird_view_visualization_folder, str(frame_idx).zfill(6))+'.png', current_bird_view)
         gr_points = points[process.segments_index]* np.array([1, 1, -1])
         gr_remission = sem_scan_current_frame.remissions[process.segments_index]
 
@@ -186,14 +199,13 @@ for sequence in sequences:
 
 
         # we need get the point index in bird view
-        current_bird_view = lidar_projection.birds_eye_point_cloud(sem_scan_current_frame.points,
-                                                                       side_range=(-50, 50), fwd_range=(-50, 50),
-                                                                       res=0.25, min_height=-2, max_height=4)
 
 
-        # will use for substraction
-        current_proj_vertex = sem_scan_current_frame.proj_xyz
-        current_range = current_bird_view
+
+
+        # # will use for substraction
+        # current_proj_vertex = sem_scan_current_frame.proj_xyz
+        # current_range = current_bird_view
 
 
         range_image_file_name = os.path.join(range_images_folder, str(frame_idx).zfill(6))
@@ -236,25 +248,29 @@ for sequence in sequences:
                 sem_scan_last_frame.open_scan(scan_paths[frame_idx - num_last_n])
                 # ground removal first
 
+                last_frame_points = sem_scan_last_frame.points
+                last_frame_points = last_frame_points * np.array([1, 1, -1])
+                last_frame_points_non_ground = process(last_frame_points)
+
+                last_frame_gr_points = last_frame_points[process.segments_index] * np.array([1, 1, -1])
+                last_frame_gr_remission = sem_scan_last_frame.remissions[process.segments_index]
 
                 # transformation
                 last_vertex = np.ones((sem_scan_last_frame.points.shape[0], sem_scan_last_frame.points.shape[1] + 1))
                 last_vertex[:, :-1] = sem_scan_last_frame.points
-                sem_scan_last_frame.points = np.linalg.inv(current_pose).dot(last_pose).dot(last_vertex.T).T[:,:-1]
+                last_frame_transfer_non_ground_points= np.linalg.inv(current_pose).dot(last_pose).dot(last_vertex.T).T[:,:-1]
 
-                # sem_scan_last_frame.points = np.linalg.inv(current_pose).dot(last_pose).dot(sem_scan_last_frame.points.T).T
-
-                points = sem_scan_last_frame.points
-                points = points * np.array([1, 1, -1])
-                points_non_ground = process(points)
-
-                gr_points = points[process.segments_index] * np.array([1, 1, -1])
-                gr_remission = sem_scan_last_frame.remissions[process.segments_index]
+                # # sem_scan_last_frame.points = np.linalg.inv(current_pose).dot(last_pose).dot(sem_scan_last_frame.points.T).T
+                #
+                #
+                #
+                # gr_points = points[process.segments_index] * np.array([1, 1, -1])
+                # gr_remission = sem_scan_last_frame.remissions[process.segments_index]
 
 
                 # do range projection
-                sem_scan_last_frame.set_points(gr_points, remissions=gr_remission, gt_idx=process.segments_index)
-                sem_scan_last_frame.do_range_projection()
+                sem_scan_last_frame.set_points(last_frame_transfer_non_ground_points, remissions=gr_remission, gt_idx=process.segments_index)
+                # sem_scan_last_frame.do_range_projection()
 
                 transformed_bird_view = lidar_projection.birds_eye_point_cloud(sem_scan_last_frame.points,
                                                         side_range=(-50, 50), fwd_range=(-50, 50),
@@ -268,22 +284,23 @@ for sequence in sequences:
                 last_range_transformed = transformed_bird_view
 
                 # generate residual image
-                valid_mask = (current_range > 0 &
+                valid_mask = (transformed_bird_view > 0 &
                              # (current_range < range_image_params['max_range']) & \
                              # (last_range_transformed > range_image_params['min_range']) & \
-                             (last_range_transformed >0))
-                difference = np.abs(current_range[valid_mask] - last_range_transformed[valid_mask])
-
-                if normalize:
-                    difference = np.abs(current_range[valid_mask] - last_range_transformed[valid_mask]) / current_range[
-                        valid_mask]
-
-                diff_image[valid_mask] = difference
+                             (current_bird_view >0))
+                # difference = np.abs(current_range[valid_mask] - last_range_transformed[valid_mask])
+                #
+                # if normalize:
+                #     difference = np.abs(current_range[valid_mask] - last_range_transformed[valid_mask]) / current_range[
+                #         valid_mask]
+                #
+                # diff_image[valid_mask] = difference
+                diff_image = valid_mask
 
                 if debug:
                     fig, axs = plt.subplots(3)
                     axs[0].imshow(last_range_transformed)
-                    axs[1].imshow(current_range)
+                    axs[1].imshow(current_bird_view)
                     axs[2].imshow(diff_image, vmin=0, vmax=10)
                     plt.show()
 

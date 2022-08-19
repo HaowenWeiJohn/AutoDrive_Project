@@ -4,6 +4,7 @@
 # Brief: This script generates residual images
 
 import os
+import pickle
 import shutil
 import sys
 import yaml
@@ -151,16 +152,49 @@ for sequence in sequences:
 
     # generate residual images for the whole sequence
     for frame_idx in tqdm(range(len(scan_paths))):
-
+        gr_clustering_dict = dict()
         current_pose = poses[frame_idx]
+
         sem_scan_current_frame.open_scan(scan_paths[frame_idx])
-        current_proj_vertex = range_projection(current_scan.astype(np.float32),
-                                         range_image_params['height'], range_image_params['width'],
-                                         range_image_params['fov_up'], range_image_params['fov_down'],
-                                         range_image_params['max_range'], range_image_params['min_range'])
-        current_range = current_proj_vertex[:, :, 3]
+        points = sem_scan_current_frame.points
+        points = points * np.array([1, 1, -1])
+        points_non_ground = process(points)
+
+        gr_points = points[process.segments_index]* np.array([1, 1, -1])
+        gr_remission = sem_scan_current_frame.remissions[process.segments_index]
+
+        # do range projection
+        sem_scan_current_frame.set_points(gr_points, remissions=gr_remission, gt_idx=process.segments_index)
+        sem_scan_current_frame.do_range_projection()
+        mask = sem_scan_current_frame.proj_mask
+
+        # do the clustering
+        range_img_x = sem_scan_current_frame.proj_xyz[:, :, 0] * mask
+        range_img_y = sem_scan_current_frame.proj_xyz[:, :, 1] * mask
+        range_img_z = sem_scan_current_frame.proj_xyz[:, :, 2] * mask
+        instance_label = cluster.ScanLineRun_cluster(range_img_x, range_img_y, range_img_z, mask,
+                                                     sem_scan_current_frame.proj_H,
+                                                     sem_scan_current_frame.proj_W)
+        instance_label = np.array(instance_label)
+
+
+        gr_clustering_dict['proj_xyz'] = sem_scan_current_frame.proj_xyz
+        gr_clustering_dict['remissions'] = sem_scan_current_frame.remissions
+        gr_clustering_dict['proj_range'] = sem_scan_current_frame.proj_range
+        gr_clustering_dict['mask'] = sem_scan_current_frame.proj_mask
+        gr_clustering_dict['proj_index'] = sem_scan_current_frame.proj_idx_gt
+
+
+        # will use for substraction
+        current_proj_vertex = sem_scan_current_frame.proj_xyz
+        current_range = sem_scan_current_frame.proj_range
+
+
         range_image_file_name = os.path.join(range_images_folder, str(frame_idx).zfill(6))
-        np.save(range_image_file_name, current_proj_vertex)
+        with open(range_image_file_name, 'wb') as f:
+            pickle.dump(gr_clustering_dict, f)
+
+        # np.save(range_image_file_name, current_proj_vertex)
 
         for n_index, num_last_n in enumerate(num_last_ns):
 
@@ -190,13 +224,36 @@ for sequence in sequences:
 
                 # load last scan, transform into the current coord and generate a transformed last range image
                 last_pose = poses[frame_idx - num_last_n]
-                last_scan = load_vertex(scan_paths[frame_idx - num_last_n])
-                last_scan_transformed = np.linalg.inv(current_pose).dot(last_pose).dot(last_scan.T).T
-                last_range_transformed = range_projection(last_scan_transformed.astype(np.float32),
-                                                          range_image_params['height'], range_image_params['width'],
-                                                          range_image_params['fov_up'], range_image_params['fov_down'],
-                                                          range_image_params['max_range'], range_image_params['min_range'])[
-                                         :, :, 3]
+
+                current_pose = poses[frame_idx]
+
+                sem_scan_last_frame.open_scan(scan_paths[frame_idx - num_last_n])
+                # transformation
+                last_vertex = np.ones((sem_scan_last_frame.points.shape[0], sem_scan_last_frame.points.shape[1] + 1))
+                last_vertex[:, :-1] = sem_scan_last_frame.points
+                sem_scan_last_frame.points = np.linalg.inv(current_pose).dot(last_pose).dot(last_vertex.T).T[:,:-1]
+
+                # sem_scan_last_frame.points = np.linalg.inv(current_pose).dot(last_pose).dot(sem_scan_last_frame.points.T).T
+
+                points = sem_scan_last_frame.points
+                points = points * np.array([1, 1, -1])
+                points_non_ground = process(points)
+
+                gr_points = points[process.segments_index] * np.array([1, 1, -1])
+                gr_remission = sem_scan_last_frame.remissions[process.segments_index]
+
+
+                # do range projection
+                sem_scan_last_frame.set_points(gr_points, remissions=gr_remission, gt_idx=process.segments_index)
+                sem_scan_last_frame.do_range_projection()
+
+
+
+
+                # last_scan_transformed = np.linalg.inv(current_pose).dot(last_pose).dot(last_scan.T).T
+
+
+                last_range_transformed = sem_scan_last_frame.proj_range
 
                 # generate residual image
                 valid_mask = (current_range > range_image_params['min_range']) & \
