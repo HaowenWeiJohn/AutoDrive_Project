@@ -55,11 +55,11 @@ val_label_dir = os.path.join(root_data_dir, 'train_test_val', 'val', 'y')
 
 train_dataset = BiSeNet_DataLoader(data_dir=train_data_dir, label_dir=train_label_dir)
 val_dataset = BiSeNet_DataLoader(data_dir=val_data_dir, label_dir=val_label_dir)
-train_loader = DataLoader(dataset=train_dataset, batch_size=24, shuffle=True)
-val_loader = DataLoader(dataset=val_dataset, batch_size=24, shuffle=False)
+train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=16, shuffle=False)
 #################
 # training logger
-training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_without_lovasz_new_machine')
+training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_without_lovasz_retrain')
 
 #################
 
@@ -120,14 +120,16 @@ for current_epoch in range(0, 60):
     train_ave_epoch_loss = np.average(epoch_loss)
     print('train_ave_epoch_loss: ', str(train_ave_epoch_loss))
 
-    history_content = [current_epoch, train_ave_epoch_loss, None, None]
+    history_content = [current_epoch, train_ave_epoch_loss, None, None, None]
+                      # current epoch, train loss, miou, iou, accuracy
 
 
 
     if current_epoch % validation_step == 0:  # make one val after the first epoch
         iou_mean, iou, acc = val(model=BiSeNet_MOS, dataloader=val_loader)
         history_content[2] = iou_mean
-        history_content[3] = acc
+        history_content[3] = iou
+        history_content[4] = acc
 
         print('validation iou mean: ', str(iou_mean), 'validation acc: ', str(acc))
         if iou_mean > max_miou:
@@ -137,6 +139,7 @@ for current_epoch in range(0, 60):
     training_logger.log_hist(epoch=history_content[0],
                              train_loss=history_content[1],
                              val_miou=history_content[2],
-                             val_acc=history_content[3])
+                             val_iou = history_content[3],
+                             val_acc=history_content[4])
 
 

@@ -51,18 +51,18 @@ class Training_Logger:
 
         with open(self.history_csv, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(['epoch', 'train_loss', 'val_miou', 'val_acc'])
+            writer.writerow(['epoch', 'train_loss', 'val_miou', 'iou', 'val_acc'])
             f.close()
 
     def save_model(self, model=None):
         if model:
             torch.save(model.state_dict(), os.path.join(self.logger_dir, self.model_name))
 
-    def log_hist(self, epoch, train_loss, val_miou=None, val_acc=None):
+    def log_hist(self, epoch, train_loss, val_miou=None, val_iou=None, val_acc=None):
 
         with open(self.history_csv, 'a+', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow([epoch, train_loss, val_miou, val_acc])
+            writer.writerow([epoch, train_loss, val_miou, val_iou, val_acc])
 
 if __name__ == '__main__':
     logger = Training_Logger(root_dir='../../utils/training_logger', logger_dir='test_save')
