@@ -39,11 +39,13 @@ print(torch.cuda.memory_summary())
 
 weight=torch.tensor(weight).to(device)
 
-WCE = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(device)
+WCE_out = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(device)
+WCE_1 = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(device)
+WCE_2 = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(device)
 
 LS = Lovasz_softmax(ignore=0).to(device)
 
-optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-5,weight_decay=1e-9)
+optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-3,weight_decay=1e-5)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.97)
 
 #################
@@ -77,7 +79,7 @@ training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_wi
 val_iou_eval = iouEval(n_classes=3, ignore=0)
 
 
-for current_epoch in range(0, 60):
+for current_epoch in range(0, 200):
 
     print('Epoch: ', current_epoch)
     print('learning rate: ', optimizer.param_groups[0]['lr'])
@@ -94,9 +96,9 @@ for current_epoch in range(0, 60):
         output, output_sup1, output_sup2 = BiSeNet_MOS(semantic_input)
         # a = output.detach().numpy()
 
-        pixel_loss1 = WCE(output, semantic_label).to(device)
-        pixel_loss2 = WCE(output_sup1, semantic_label).to(device)
-        pixel_loss3 = WCE(output_sup2, semantic_label).to(device)
+        pixel_loss1 = WCE_out(output, semantic_label).to(device)
+        pixel_loss2 = WCE_1(output_sup1, semantic_label).to(device)
+        pixel_loss3 = WCE_2(output_sup2, semantic_label).to(device)
 
         total_pixel_loss = pixel_loss1+pixel_loss2+pixel_loss3
         total_pixel_loss = total_pixel_loss.contiguous().view(-1)

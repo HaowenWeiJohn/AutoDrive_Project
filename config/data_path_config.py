@@ -7,8 +7,9 @@ root_data_dir = ''
 
 
 if os_type == "Windows":
-    root_data_dir = 'C:/Users/Haowe/PycharmProjects/AutoDrive_Project/data'
-    root_save_dir = 'C:/Users/Haowe/PycharmProjects/AutoDrive_Project/training_save'
+    root_data_dir = 'C:/Users/Haowe/Desktop/Auto_Drive/data'
+    root_save_dir = 'C:/Users/Haowe/Desktop/Auto_Drive/AutoDrive_Project/training_save'
+
 else:
     # root_data_dir = '/home/ak209/Desktop/hwei/AutoDrive/data'
     root_data_dir = '/home/ak209/Desktop/hwei/AutoDrive/data'
