@@ -25,6 +25,7 @@ nclasses = 3
 weight = [0.0, 9.0, 251.0]
 validation_step = 1
 max_miou = 0
+max_moving_iou=0
 
 print(torch.cuda.is_available())
 print(torch.cuda.current_device())
@@ -45,7 +46,7 @@ WCE_2 = nn.CrossEntropyLoss(weight=weight, ignore_index=0, reduction='none').to(
 
 LS = Lovasz_softmax(ignore=0).to(device)
 
-optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-3,weight_decay=1e-5)
+optimizer = torch.optim.AdamW(BiSeNet_MOS.parameters(), lr=1e-3,weight_decay=5e-6)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.97)
 
 #################
@@ -61,7 +62,7 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
 val_loader = DataLoader(dataset=val_dataset, batch_size=16, shuffle=False)
 #################
 # training logger
-training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_without_lovasz_retrain')
+training_logger = Training_Logger(root_dir=root_save_dir, logger_dir='BiSeNet_retrain_with_Lovasz')
 
 #################
 
@@ -99,8 +100,9 @@ for current_epoch in range(0, 200):
         pixel_loss1 = WCE_out(output, semantic_label).to(device)
         pixel_loss2 = WCE_1(output_sup1, semantic_label).to(device)
         pixel_loss3 = WCE_2(output_sup2, semantic_label).to(device)
+        ls_loss = LS(output, semantic_label).to(device)
 
-        total_pixel_loss = pixel_loss1+pixel_loss2+pixel_loss3
+        total_pixel_loss = pixel_loss1+pixel_loss2+pixel_loss3+ls_loss
         total_pixel_loss = total_pixel_loss.contiguous().view(-1)
         ce_loss = total_pixel_loss.mean()
 
@@ -132,10 +134,11 @@ for current_epoch in range(0, 200):
         history_content[2] = iou_mean
         history_content[3] = iou
         history_content[4] = acc
+        moving_iou = iou[-1]
 
-        print('validation iou mean: ', str(iou_mean), 'validation acc: ', str(acc))
-        if iou_mean > max_miou:
-            max_miou = iou_mean
+        print('validation iou mean: ', str(iou_mean), 'validation iou: ', iou,'validation acc: ', str(acc))   #
+        if moving_iou > max_moving_iou:
+            max_moving_iou = moving_iou
             training_logger.save_model(model=BiSeNet_MOS)
 
     training_logger.log_hist(epoch=history_content[0],
