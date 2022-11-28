@@ -5,7 +5,7 @@ import sys
 from utils.auxiliary.np_ioueval import iouEval
 from utils.training_logger.training_logger import Training_Logger
 
-sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
+# sys.path.insert(1, '/work/hwei/HaowenWeiDeepLearning/MOS_Project/AutoDrive_Project')
 
 import numpy as np
 import torch

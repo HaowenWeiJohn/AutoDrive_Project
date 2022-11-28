@@ -26,10 +26,10 @@ folder_name = 'test'
 # the data structure will be range image + res_image_1_2_3_4_5_6_7
 
 sequences = ['19', '20', '21']
+
+
+
 back_track_ns = [1,2,3,4,5,6,7,8]
-
-
-
 for sequence in sequences:
     # sample_index = 0
     this_sequence_folder = os.path.join(sequence_folder, sequence)
